@@ -68,6 +68,9 @@ bindkey "^[[D" backward-char                          # <
 bindkey "^[[H" beginning-of-line                      # [Home] 行首
 bindkey "^[[F" end-of-line                            # [End]　行末
 
+bindkey "\E[1~" beginning-of-line
+bindkey "\E[4~" end-of-line
+
 # 自带的常用快捷键有
 # [ctrl-u] 清空当前行
 
