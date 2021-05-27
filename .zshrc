@@ -43,8 +43,8 @@ SAVEHIST=10000
 export BROWSER="/usr/bin/google-chrome-stable"
 export EDITOR="vim"
 export PATH="${PATH}:"
-export http_proxy='localhost:8888'
-export https_proxy='localhost:8888'
+#export http_proxy='localhost:8888'
+#export https_proxy='localhost:8888'
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#5faf87"
 
 #-----------------------------
@@ -70,7 +70,7 @@ bindkey "^[[F" end-of-line                            # [End]　行末
 
 bindkey "\E[1~" beginning-of-line
 bindkey "\E[4~" end-of-line
-
+bindkey "\e[3~" delete-char
 # 自带的常用快捷键有
 # [ctrl-u] 清空当前行
 
