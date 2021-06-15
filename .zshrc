@@ -1,6 +1,6 @@
 #------------------------------------------------------------------#
 # File:     .zshrc   ZSH resource file                             #
-# Version:  1.１                                                 #
+# Version:  1.１                                                   #
 # Author:   manu2x@qq.com                                          #
 #------------------------------------------------------------------#
 
@@ -40,11 +40,16 @@ SAVEHIST=10000
 #------------------------------
 # Variables
 #------------------------------
+NPM_PACKAGES="${HOME}/.npm-packages"
+export PATH="$PATH:$NPM_PACKAGES/bin"
+# Preserve MANPATH if you already defined it somewhere in your config.
+# Otherwise, fall back to `manpath` so we can inherit from `/etc/manpath`.
+export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
 export BROWSER="/usr/bin/google-chrome-stable"
 export EDITOR="vim"
 export PATH="${PATH}:"
-#export http_proxy='localhost:8888'
-#export https_proxy='localhost:8888'
+#export http_proxy='http://localhost:8888'
+#export https_proxy='http://localhost:8888'
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#5faf87"
 
 #-----------------------------
@@ -73,6 +78,27 @@ bindkey "\E[4~" end-of-line
 bindkey "\e[3~" delete-char
 # 自带的常用快捷键有
 # [ctrl-u] 清空当前行
+# [ctrl-l] 清空屏幕
+# 其他快捷键
+#option	action
+#	CTRL-c	Stop current command
+#	CTRL-z	Sleep program
+#	CTRL-a	Go to start of line
+#	CTRL-e	Go to end of line
+#	CTRL-u	Cut from start of line
+#	CTRL-w	delete a word in front the Cursor
+#	CTRL-k	Cut to end of line
+#	CTRL-r	Search history
+#	CTRL + l	Clear screen
+#	CTRL + s	Stop output to screen
+#	CTRL + q	Re-enable screen output
+#	!!	Repeat last command
+#	!abc	Run last command starting with abc
+#	!abc:p	Print last command starting with abc
+#	!$	Last argument of previous command
+#	ALT-.	Last argument of previous command
+#	!*	All arguments of previous command
+#	^abc ^123	Run previous command, replacing abc with 123
 
 
 #------------------------------
