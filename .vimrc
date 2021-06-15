@@ -5,13 +5,22 @@ syntax on		" syntax high lighting
 set hlsearch		" hight lighting search
 set ruler		" right bar
 set showmode		" left bar
-set cursorcolumn
+set nocompatible
+set foldmethod=indent "set default foldmethod
+	"manual           	手工定义折叠
+	"indent             	更多的缩进表示更高级别的折叠
+	"expr               	用表达式来定义折叠
+	"syntax             	用语法高亮来定义折叠
+	"diff                  	对没有更改的文本进行折叠
+	"marker            	对文中的标志折叠
+"set cursorcolumn
 "set cursorline
 "highlight CursorColumn cterm=NONE ctermbg=white ctermfg=green guibg=NONE guifg=NONE
 
 """"""""""""""""""""
 	"vundle config
 """"""""""""""""""""
+
 set nocompatible              " 去除VI一致性,必须
 filetype off                  " 必须
 
@@ -37,7 +46,7 @@ Plugin 'VundleVim/Vundle.vim'
 """"""""""""""
 	"plugin snipmate：已弃用，使用Ultisnip
 """"""""""""
-	"Plugin 'MarcWeber/vim-addon-mw-utils'
+ 	"Plugin 'MarcWeber/vim-addon-mw-utils'
 	"Plugin Plugin 'tomtom/tlib_vim'
 	"Plugin Plugin 'garbas/vim-snipmate'
 	"Plugin 
@@ -45,23 +54,84 @@ Plugin 'VundleVim/Vundle.vim'
 	"Plugin Plugin 'honza/vim-snippets'
 	"Plugin let g:snipMate = { 'snippet_version' : 1 }
 	"Plugin let g:snips_author = 'manu2x'
+
 """""""""""""
 	" plugin Ultisnip
 """""""""""""
+
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+let g:UltiSnipsListSnippets="<c-l>"
 let g:UltiSnipsUsePythonVersion = 3
 let g:UltiSnipsSnippetsDir=[$HOME."/.vim/bundle/vim-snippets/UltiSnips"]
 let g:UltiSnipsSnippetDirectories=[$HOME."/.vim/bundle/vim-snippets/UltiSnips"]
 " 如果你希望使用 :UltiSnipsEdit 的时候可以垂直切分你的窗口来编辑
 let g:UltiSnipsEditSplit="vertical"
+
 """""""""""""
 	"plugin jedi-vim
 """"""""""""""
+
 "Plugin 'davidhalter/jedi-vim'
+
+"""""""""""""
+	"plugin YCM
+""""""""""""
+
+Plugin 'ycm-core/YouCompleteMe'
+	"<C-j>, <Down>, <C-n>, <Tab>- 选择下一项
+	"<C-k>, <Up>, <C-p>, <S-Tab>- 选择上一项
+	"<PageUp>, <kPageUp>- 跳上一屏项目
+	"<PageDown>, <kPageDown>- 跳下一屏项目
+	"<Home>, <kHome>- 跳转到第一项
+	"<End>, <kEnd>- 跳到最后一项
+	"<CR> - 跳转到所选项目
+	"<C-c> 取消/关闭弹出窗口
+""""""""""""
+	" 解决YCM和Ultisnips热键冲突
+""""""""""""
+function! g:UltiSnips_Complete()
+  call UltiSnips#ExpandSnippet()
+  if g:ulti_expand_res == 0
+    if pumvisible()
+      return "\<C-n>"
+    else
+      call UltiSnips#JumpForwards()
+      if g:ulti_jump_forwards_res == 0
+        return "\<TAB>"
+      endif
+    endif
+  endif
+  return ""
+endfunction
+
+function! g:UltiSnips_Reverse()
+  call UltiSnips#JumpBackwards()
+  if g:ulti_jump_backwards_res == 0
+    return "\<C-P>"
+  endif
+
+  return ""
+endfunction
+
+
+if !exists("g:UltiSnipsJumpForwardTrigger")
+  let g:UltiSnipsJumpForwardTrigger = "<tab>"
+endif
+if !exists("g:UltiSnipsJumpBackwardTrigger")
+  let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+endif
+
+au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
+
+""""""""""""""""""""""
+	"Vundle end
+""""""""""""""""""""""
+
 call vundle#end()            " 必须
 filetype plugin indent on    " 必须 加载vim自带和插件相应的语法和文件类型相关脚本
 " 忽视插件改变缩进,可以使用以下替代:
