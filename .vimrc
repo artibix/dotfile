@@ -1,10 +1,30 @@
-set display=uhex	"未知字符使用16进制显示 
-set ft=xxd		"16进制高亮
+set background=dark "light
+set t_Co=256
+let g:solarized_termcolors=256
+ colorscheme solarized
+"colorscheme shine
+"https://github.com/tomasr/molokai/blob/master/colors/molokai.vim
+"colorscheme molokai 
+set display=uhex	    "未知字符使用16进制显示 
+set ft=xxd		        "16进制高亮
 set nu
-syntax on		" syntax high lighting
-set hlsearch		" hight lighting search
-set ruler		" right bar
-set showmode		" left bar
+syntax on		        " syntax high lighting
+set hlsearch		    " hight lighting search
+set ruler		        " right5 bar
+set showmode		    " left bar
+set relativenumber
+set cursorline 
+highlight CursorLine cterm=NONE ctermbg=grey ctermfg=NONE guibg=NONE guifg=NONE
+set expandtab
+set shiftwidth=4
+set autoindent
+set tabstop=4
+set softtabstop=4
+set showmatch
+set autoread
+
+"set cursorcolumn
+"highlight CursorColumn cterm=NONE ctermbg=white ctermfg=green guibg=NONE guifg=NONE
 
 set foldmethod=manual "set default foldmethod
 	"manual           	手工定义折叠
@@ -13,9 +33,6 @@ set foldmethod=manual "set default foldmethod
 	"syntax             	用语法高亮来定义折叠
 	"diff                  	对没有更改的文本进行折叠
 	"marker            	对文中的标志折叠
-"set cursorcolumn
-"set cursorline
-"highlight CursorColumn cterm=NONE ctermbg=white ctermfg=green guibg=NONE guifg=NONE
 
 """"""""""""""""""""
 	"vundle config
@@ -47,8 +64,6 @@ set foldmethod=manual "set default foldmethod
  	"Plugin 'MarcWeber/vim-addon-mw-utils'
 	"Plugin Plugin 'tomtom/tlib_vim'
 	"Plugin Plugin 'garbas/vim-snipmate'
-	"Plugin 
-	"Plugin " Optional:
 	"Plugin Plugin 'honza/vim-snippets'
 	"Plugin let g:snipMate = { 'snippet_version' : 1 }
 	"Plugin let g:snips_author = 'manu2x'
@@ -61,6 +76,12 @@ set foldmethod=manual "set default foldmethod
 	Plugin 'Xuyuanp/nerdtree-git-plugin'
 	Plugin 'junegunn/fzf'
 	Plugin 'junegunn/fzf.vim'
+
+""""""""""""
+    " vim-colors-solarized
+""""""""""""
+    let g:solarized_termcolors=256
+    Plugin 'altercation/vim-colors-solarized'
 
 """"""""""""
 	"plugin airline
@@ -221,7 +242,7 @@ set foldmethod=manual "set default foldmethod
 	" command
 	""""""""
 	cmap su w !sudo tee >/dev/null %
-	cnoremap <C-j> <t_kd>
-	cnoremap <C-k> <t_ku>
+	cnoremap <C-j> <Down>
+	cnoremap <C-k> <Up>
 	cnoremap <C-a> <Home>
 	cnoremap <C-e> <End>
