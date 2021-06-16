@@ -1,7 +1,8 @@
+set enc=utf-8
 set background=dark "light
 set t_Co=256
 let g:solarized_termcolors=256
- colorscheme solarized
+colorscheme solarized
 "colorscheme shine
 "https://github.com/tomasr/molokai/blob/master/colors/molokai.vim
 "colorscheme molokai 
@@ -14,7 +15,7 @@ set ruler		        " right5 bar
 set showmode		    " left bar
 set relativenumber
 set cursorline 
-highlight CursorLine cterm=NONE ctermbg=grey ctermfg=NONE guibg=NONE guifg=NONE
+highlight CursorLine cterm=NONE ctermbg=green ctermfg=NONE guibg=NONE guifg=NONE
 set expandtab
 set shiftwidth=4
 set autoindent
@@ -85,7 +86,7 @@ set foldmethod=manual "set default foldmethod
 """"""""""""
     " vim-colors-solarized
 """"""""""""
-    let g:solarized_termcolors=256
+
     Plugin 'altercation/vim-colors-solarized'
 
 """"""""""""
