@@ -5,8 +5,8 @@ syntax on		" syntax high lighting
 set hlsearch		" hight lighting search
 set ruler		" right bar
 set showmode		" left bar
-set nocompatible
-set foldmethod=indent "set default foldmethod
+
+set foldmethod=manual "set default foldmethod
 	"manual           	手工定义折叠
 	"indent             	更多的缩进表示更高级别的折叠
 	"expr               	用表达式来定义折叠
@@ -186,3 +186,42 @@ set foldmethod=indent "set default foldmethod
 	            exec "!firefox %.html &"
 	endif
 	    endfunc
+"""""""""""""""""""
+"my shortkey
+"""""""""""""""""""
+
+	"alt+上下箭头移动块
+	"nmap <M-k> ddP
+	"nmap <M-j> ddp
+
+	""""""""
+	" all
+	""""""""
+	noremap <space> :
+	noremap H ^
+	noremap L $
+
+	""""""""
+	" insert
+	""""""""
+	inoremap <C-j> <down>
+	inoremap <C-k> <up>
+	inoremap <C-a> <Home>
+	inoremap <C-e> <End>
+
+	inoremap jk <ESC>
+
+	""""""""
+	" normal
+	""""""""
+	nnoremap gu gU
+	nnoremap gl gu
+
+	""""""""
+	" command
+	""""""""
+	cmap su w !sudo tee >/dev/null %
+	cnoremap <C-j> <t_kd>
+	cnoremap <C-k> <t_ku>
+	cnoremap <C-a> <Home>
+	cnoremap <C-e> <End>
