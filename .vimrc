@@ -15,7 +15,7 @@ set ruler		        " right5 bar
 set showmode		    " left bar
 set relativenumber
 set cursorline 
-highlight CursorLine cterm=NONE ctermbg=green ctermfg=NONE guibg=NONE guifg=NONE
+"highlight CursorLine cterm=NONE ctermbg=green ctermfg=NONE guibg=NONE guifg=NONE
 set expandtab
 set shiftwidth=4
 set autoindent
@@ -107,7 +107,7 @@ set foldmethod=manual "set default foldmethod
 	Plugin 'SirVer/ultisnips'
 	Plugin 'honza/vim-snippets'
 	let g:UltiSnipsExpandTrigger="<tab>"
-	let g:UltiSnipsJumpForwardTrigger="<c-b>"
+	let g:UltiSnipsJumpForwardTrigger="<tab>"
 	let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 	let g:UltiSnipsListSnippets="<c-l>"
 	let g:UltiSnipsUsePythonVersion = 3
