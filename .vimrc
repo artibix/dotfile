@@ -67,6 +67,11 @@ set foldmethod=manual "set default foldmethod
 	"Plugin Plugin 'honza/vim-snippets'
 	"Plugin let g:snipMate = { 'snippet_version' : 1 }
 	"Plugin let g:snips_author = 'manu2x'
+""""""""""""
+    " auto-format
+""""""""""""
+    
+    Plugin 'Chiel92/vim-autoformat'
 
 """"""""""""
 	" plugin nerdtree
