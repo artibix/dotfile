@@ -29,6 +29,23 @@ else
   . ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
 
+if [[ -f ~/.fzf.zsh ]]; then
+    source ~/.fzf.zsh 
+else 
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf &&  ~/.fzf/install
+fi
+export FZF_DEFAULT_COMMAND='fd --type f --exclude ".git" --exclude "node_modules" . /etc /home --color=always'
+export FZF_DEFAULT_OPTS="--ansi --preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'"
+
+# fzf常见用法：
+# ctrl+r 历史指令
+# ctrl+t 启动fzf
+# alt+c cd
+# vim **<tab>
+# kill -9 **<tab>
+# ssh **<tab>
+# export **
+
 #------------------------------
 # History stuff
 #------------------------------
