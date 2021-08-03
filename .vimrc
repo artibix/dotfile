@@ -2,7 +2,8 @@ set enc=utf-8
 set background=dark "light
 set t_Co=256
 let g:solarized_termcolors=256
-colorscheme solarized
+colorscheme onedark
+"colorscheme solarized
 "colorscheme shine
 "https://github.com/tomasr/molokai/blob/master/colors/molokai.vim
 "colorscheme molokai 
@@ -105,7 +106,8 @@ set foldmethod=manual "set default foldmethod
 """""""""""""
 
 	Plugin 'SirVer/ultisnips'
-	Plugin 'honza/vim-snippets'
+	"Plugin 'honza/vim-snippets'
+	Plugin 'yangchaohe/vim-snippets'
 	let g:UltiSnipsExpandTrigger="<tab>"
 	let g:UltiSnipsJumpForwardTrigger="<tab>"
 	let g:UltiSnipsJumpBackwardTrigger="<c-z>"
@@ -167,6 +169,11 @@ set foldmethod=manual "set default foldmethod
 	au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
 	au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsJumpBackwardTrigger . " <C-R>=g:UltiSnips_Reverse()<cr>"
 	
+""""""""""""""""""""""
+" onedark
+"""""""""""""""""""""
+    Plugin  'joshdick/onedark.vim'
+
 """"""""""""""""""""""
 	"Vundle end
 """"""""""""""""""""""
