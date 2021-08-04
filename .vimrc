@@ -223,13 +223,16 @@ set foldmethod=manual "set default foldmethod
 """""""""""""""""""
 "my shortkey
 """""""""""""""""""
-
-	"alt+上下箭头移动块
-	"nmap <M-k> ddP
-	"nmap <M-j> ddp
+    " vim各种模式
+    " For Normal mode: When typing commands.
+    " For Visual mode: When typing commands while the Visual area is highlighted.
+    " For Select mode: like Visual mode but typing text replaces the selection.
+    " For Operator-pending mode: When an operator is pending (after “d”, “y”, “c”, etc.). See below: |omap-info|.
+    " For Insert mode. These are also used in Replace mode.
+    " For Command-line mode: When entering a “:” or “/“ command.
 
 	""""""""
-	" all
+	" normal,Insert,Command 
 	""""""""
 	noremap <space> :
 	noremap H ^
@@ -237,8 +240,10 @@ set foldmethod=manual "set default foldmethod
 
 	""""""""
 	" insert
+    " 默认常用快捷键
+    " ctrl+h: 删除当前光标所处字符
 	""""""""
-	inoremap <C-j> <down>
+    inoremap <C-j> <down>
 	inoremap <C-k> <up>
 	inoremap <C-a> <Home>
 	inoremap <C-e> <End>
