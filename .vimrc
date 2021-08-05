@@ -78,8 +78,10 @@ Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'Chiel92/vim-autoformat'
 noremap  <F3> :Autoformat <CR>
-au BufWrite * :Autoformat
-
+au BufRead,BufNewFile *.zshrc setfiletype zsh
+if &filetype != 'zsh'
+	exec "au BufWrite * :Autoformat"
+endif
 """"""""""""
 " plugin nerdtree
 """"""""""""

@@ -228,8 +228,8 @@ setprompt() {
   YS_VCS_PROMPT_CLEAN="%{$fg[green]%}"
 
   zstyle ':vcs_info:git*' formats "${YS_VCS_PROMPT_PREFIX1}git\
-    ${YS_VCS_PROMPT_PREFIX2}%b\
-    ${YS_VCS_PROMPT_DIRTY}%u${YS_VCS_PROMPT_CLEAN}%c"
+${YS_VCS_PROMPT_PREFIX2}%b\
+${YS_VCS_PROMPT_DIRTY}%u${YS_VCS_PROMPT_CLEAN}%c"
       ssh_info () {
         if [[ -n "$SSH_CLIENT"  ||  -n "$SSH2_CLIENT" ]]; then
           p_host='%F{yellow}%M%f'
@@ -262,18 +262,18 @@ local exit_code="%(?,,C:%{$fg[red]%}%?%{$reset_color%})"
 # $
 PROMPT="
 %{$terminfo[bold]$fg[blue]%}#%{$reset_color%} \
-  %(#,%{$bg[yellow]%}%{$fg[black]%}%n%{$reset_color%},%{$fg[cyan]%}%n) \
-  %{$fg[white]%}@ \
-  ${p_host} \
-  %{$fg[white]%}in \
-  %{$terminfo[bold]$fg[yellow]%}%~%{$reset_color%}\
-  ${venv_info}\
-  \${vcs_info_msg_0_}\
-  \
-  %{$fg[white]%}[%*] $exit_code
-  %{$terminfo[bold]$fg[yellow]%}-> %{$reset_color%}"
+%(#,%{$bg[yellow]%}%{$fg[black]%}%n%{$reset_color%},%{$fg[cyan]%}%n) \
+%{$fg[white]%}@ \
+${p_host} \
+%{$fg[white]%}in \
+%{$terminfo[bold]$fg[yellow]%}%~%{$reset_color%}\
+${venv_info}\
+\${vcs_info_msg_0_}\
+\
+ %{$fg[white]%}[%*] $exit_code
+%{$terminfo[bold]$fg[yellow]%}-> %{$reset_color%}"
 
-  PS2=$'%_>'
+PS2=$'%_>'
 }
 setprompt
-
+test
