@@ -30,9 +30,9 @@ else
 fi
 
 if [[ -f ~/.fzf.zsh ]]; then
-    source ~/.fzf.zsh 
-else 
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf &&  ~/.fzf/install
+  source ~/.fzf.zsh
+else
+  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf &&  ~/.fzf/install
 fi
 export FZF_DEFAULT_COMMAND='fd --type f --exclude ".git" --exclude "node_modules" . --color=always'
 export FZF_DEFAULT_OPTS="--ansi --preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'"
@@ -80,7 +80,6 @@ export LS_COLORS
 #------------------------------
 # bindkey -e
 
-bindkey '^r' history-incremental-search-backward      # [Ctrl-r] - Search backward incrementally for a specified string. The string may begin with ^ to anchor the search to the beginning of the line.
 bindkey "^[[1;5C" forward-word                        # ctrl-rightArrow 向前移动一个单词，以空格为标准
 bindkey "^[[1;5D" backward-word                       # ctrl-leftArrow　向后移动一个单词
 bindkey "^[[A" history-beginning-search-backward      # ^ 根据输入的字符向后查找历史指令
@@ -97,41 +96,46 @@ bindkey "\e[3~" delete-char
 # [ctrl-u] 清空当前行
 # [ctrl-l] 清空屏幕
 # 其他快捷键
-#option	action
-#	CTRL-c	Stop current command
-#	CTRL-z	Sleep program
-#	CTRL-a	Go to start of line
-#	CTRL-e	Go to end of line
-#	CTRL-u	Cut from start of line
-#	CTRL-w	delete a word in front the Cursor
-#	CTRL-k	Cut to end of line
-#	CTRL-r	Search history
-#	CTRL + l	Clear screen
-#	CTRL + s	Stop output to screen
-#	CTRL + q	Re-enable screen output
-#	!!	Repeat last command
-#	!abc	Run last command starting with abc
-#	!abc:p	Print last command starting with abc
-#	!$	Last argument of previous command
-#	ALT-.	Last argument of previous command
-#	!*	All arguments of previous command
-#	^abc ^123	Run previous command, replacing abc with 123
+#option action
+#   CTRL-c  Stop current command
+#   CTRL-z  Sleep program
+#   CTRL-a  Go to start of line
+#   CTRL-e  Go to end of line
+#   CTRL-u  Cut from start of line
+#   CTRL-w  delete a word in front the Cursor
+#   CTRL-k  Cut to end of line
+#   CTRL-r  Search history
+#   CTRL + l    Clear screen
+#   CTRL + s    Stop output to screen
+#   CTRL + q    Re-enable screen output
+#   !!  Repeat last command
+#   !abc    Run last command starting with abc
+#   !abc:p  Print last command starting with abc
+#   !$  Last argument of previous command
+#   ALT-.   Last argument of previous command
+#   !*  All arguments of previous command
+#   ^abc ^123   Run previous command, replacing abc with 123
 
 
 #------------------------------
 # Alias stuff
 #------------------------------
-alias ls="ls --color -F"
-alias ll="ls --color -lh"
-alias spm="sudo pacman"
+
+# git
 alias gaa="git add --all"
-alias gcmsg='git commit -m'
+alias gci='git commit -m'
 alias ga='git add'
 alias gst='git status'
 alias gp='git push'
+
+# manjaro
+alias ls="ls --color -F"
+alias ll="ls --color -lh"
+alias spm="sudo pacman"
 alias rm='trash'
 alias cat='bat'
 alias cp='cp -i'
+alias sys='systemctl'
 
 #------------------------------
 # ShellFuncs
@@ -147,14 +151,14 @@ man() {
     LESS_TERMCAP_ue=$(printf "\e[0m") \
     LESS_TERMCAP_us=$(printf "\e[1;32m") \
     man "$@"
-}
+  }
 
 #------------------------------
 # Comp stuff
 #------------------------------
 autoload -U promptinit
 promptinit
-zmodload zsh/complist 
+zmodload zsh/complist
 autoload -Uz compinit
 compinit
 zstyle :compinstall filename '${HOME}/.zshrc'
@@ -185,20 +189,20 @@ case $TERM in
     precmd () {
       vcs_info
       print -Pn "\e]0;[%n@%M][%~]%#\a"
-    } 
-    preexec () { print -Pn "\e]0;[%n@%M][%~]%# ($1)\a" }
-    ;;
-  screen|screen-256color)
-    precmd () { 
-      vcs_info
-      print -Pn "\e]83;title \"$1\"\a" 
-      print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~]\a" 
     }
-    preexec () { 
-      print -Pn "\e]83;title \"$1\"\a" 
-      print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~] ($1)\a" 
-    }
-    ;; 
+  preexec () { print -Pn "\e]0;[%n@%M][%~]%# ($1)\a" }
+  ;;
+screen|screen-256color)
+  precmd () {
+    vcs_info
+    print -Pn "\e]83;title \"$1\"\a"
+    print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~]\a"
+  }
+preexec () {
+  print -Pn "\e]83;title \"$1\"\a"
+  print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~] ($1)\a"
+}
+;;
 esac
 
 #------------------------------
@@ -214,7 +218,7 @@ zstyle ':vcs_info:*' check-for-changes true
 
 
 setprompt() {
- setopt prompt_subst
+  setopt prompt_subst
 
   # VCS
   YS_VCS_PROMPT_PREFIX1=" %{$fg[white]%}on%{$reset_color%} "
@@ -223,17 +227,17 @@ setprompt() {
   YS_VCS_PROMPT_DIRTY=" %{$fg[red]%}"
   YS_VCS_PROMPT_CLEAN="%{$fg[green]%}"
 
-zstyle ':vcs_info:git*' formats "${YS_VCS_PROMPT_PREFIX1}git\
-${YS_VCS_PROMPT_PREFIX2}%b\
-${YS_VCS_PROMPT_DIRTY}%u${YS_VCS_PROMPT_CLEAN}%c"
-  ssh_info () {
-    if [[ -n "$SSH_CLIENT"  ||  -n "$SSH2_CLIENT" ]]; then 
-    p_host='%F{yellow}%M%f'
-  else
-    p_host='%F{green}%M%f'
-  fi
-  }
-  ssh_info
+  zstyle ':vcs_info:git*' formats "${YS_VCS_PROMPT_PREFIX1}git\
+    ${YS_VCS_PROMPT_PREFIX2}%b\
+    ${YS_VCS_PROMPT_DIRTY}%u${YS_VCS_PROMPT_CLEAN}%c"
+      ssh_info () {
+        if [[ -n "$SSH_CLIENT"  ||  -n "$SSH2_CLIENT" ]]; then
+          p_host='%F{yellow}%M%f'
+        else
+          p_host='%F{green}%M%f'
+        fi
+      }
+    ssh_info
 
 
 # Virtualenv
@@ -241,8 +245,8 @@ local venv_info='$(virtenv_prompt)'
 YS_THEME_VIRTUALENV_PROMPT_PREFIX=" %{$fg[green]%}"
 YS_THEME_VIRTUALENV_PROMPT_SUFFIX=" %{$reset_color%}%"
 virtenv_prompt() {
-	[[ -n ${VIRTUAL_ENV} ]] || return
-	echo "${YS_THEME_VIRTUALENV_PROMPT_PREFIX}${VIRTUAL_ENV:t}${YS_THEME_VIRTUALENV_PROMPT_SUFFIX}"
+  [[ -n ${VIRTUAL_ENV} ]] || return
+  echo "${YS_THEME_VIRTUALENV_PROMPT_PREFIX}${VIRTUAL_ENV:t}${YS_THEME_VIRTUALENV_PROMPT_SUFFIX}"
 }
 
 local exit_code="%(?,,C:%{$fg[red]%}%?%{$reset_color%})"
@@ -258,18 +262,18 @@ local exit_code="%(?,,C:%{$fg[red]%}%?%{$reset_color%})"
 # $
 PROMPT="
 %{$terminfo[bold]$fg[blue]%}#%{$reset_color%} \
-%(#,%{$bg[yellow]%}%{$fg[black]%}%n%{$reset_color%},%{$fg[cyan]%}%n) \
-%{$fg[white]%}@ \
-${p_host} \
-%{$fg[white]%}in \
-%{$terminfo[bold]$fg[yellow]%}%~%{$reset_color%}\
-${venv_info}\
-\${vcs_info_msg_0_}\
- \
-%{$fg[white]%}[%*] $exit_code
-%{$terminfo[bold]$fg[yellow]%}-> %{$reset_color%}"
+  %(#,%{$bg[yellow]%}%{$fg[black]%}%n%{$reset_color%},%{$fg[cyan]%}%n) \
+  %{$fg[white]%}@ \
+  ${p_host} \
+  %{$fg[white]%}in \
+  %{$terminfo[bold]$fg[yellow]%}%~%{$reset_color%}\
+  ${venv_info}\
+  \${vcs_info_msg_0_}\
+  \
+  %{$fg[white]%}[%*] $exit_code
+  %{$terminfo[bold]$fg[yellow]%}-> %{$reset_color%}"
 
- PS2=$'%_>'
+  PS2=$'%_>'
 }
 setprompt
 
