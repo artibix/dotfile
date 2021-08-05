@@ -276,4 +276,3 @@ ${venv_info}\
 PS2=$'%_>'
 }
 setprompt
-test
