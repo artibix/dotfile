@@ -191,6 +191,12 @@ map <leader><space> :FixWhitespace<cr>
 au BufWrite * :FixWhitespace
 
 """"""""""""""""""""""
+"markdown preview    "
+""""""""""""""""""""""
+
+Plugin 'iamcco/mathjax-support-for-mkdp'
+Plugin 'iamcco/markdown-preview.vim'
+
 "Vundle end
 """"""""""""""""""""""
 
@@ -224,16 +230,17 @@ func! CompileRunGcc()
 		exec "!javac %"
 		exec "!time java %<"
 	elseif &filetype == 'sh'
-		:!time bash %
+		exec ":!time bash %"
 	elseif &filetype == 'python'
-		exec "!time python2.7 %"
+		exec "!time python %"
 	elseif &filetype == 'html'
 		exec "!firefox % &"
 	elseif &filetype == 'go'
 		exec "!time go run %"
-	elseif &filetype == 'mkd'
-		exec "!~/.vim/markdown.pl % > %.html &"
-		exec "!firefox %.html &"
+	elseif &filetype == 'markdown'
+		""exec "!~/.vim/markdown.pl % > %.html &"
+		""exec "!firefox %.html &"
+		exec ":MarkdownfPreview"
 	endif
 endfunc
 """""""""""""""""""
@@ -253,12 +260,22 @@ endfunc
 noremap <space> :
 noremap H ^
 noremap L $
+noremap <leader>1 :b1<cr>
+noremap <leader>2 :b2<cr>
+noremap <leader>3 :b3<cr>
+noremap <leader>4 :b4<cr>
+noremap <leader>5 :b5<cr>
+noremap <leader>6 :b6<cr>
+noremap <leader>7 :b7<cr>
+noremap <leader>8 :b8<cr>
+noremap <leader>9 :b9<cr>
 
 """"""""
 " insert
 " 默认常用快捷键
 " ctrl+h: 删除当前光标所处字符
 """"""""
+inoremap <C-f> <down>
 inoremap <C-j> <down>
 inoremap <C-k> <up>
 inoremap <C-a> <Home>
@@ -280,6 +297,7 @@ cnoremap <C-j> <Down>
 cnoremap <C-k> <Up>
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
+
 """""""
 " complete
 """"""
@@ -335,4 +353,4 @@ inoremap > <ESC>:call RemoveNextDoubleChar('>')<CR>a
 """"""""""""
 " my autocmd
 """"""""""""
-autocmd BufReadPost * normal! g`"
+autocmd BufReadPost * normal! g`"  "跳转以前编辑位置"
