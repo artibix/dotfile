@@ -78,10 +78,7 @@ Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'Chiel92/vim-autoformat'
 noremap  <F3> :Autoformat <CR>
-au BufRead,BufNewFile *.zshrc setfiletype zsh
-if &filetype != 'zsh'
-	exec "au BufWrite * :Autoformat"
-endif
+exec "au BufWrite *.py,*.php,*.c,*.java :Autoformat"
 """"""""""""
 " plugin nerdtree
 """"""""""""
@@ -122,7 +119,6 @@ let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 let g:UltiSnipsListSnippets="<c-l>"
 let g:UltiSnipsUsePythonVersion = 3
-let g:UltiSnipsSnippetsDir=[$HOME."/.vim/bundle/vim-snippets/UltiSnips"]
 let g:UltiSnipsSnippetDirectories=[$HOME."/.vim/bundle/vim-snippets/UltiSnips"]
 " 如果你希望使用 :UltiSnipsEdit 的时候可以垂直切分你的窗口来编辑
 let g:UltiSnipsEditSplit="vertical"
