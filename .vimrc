@@ -240,7 +240,7 @@ func! CompileRunGcc()
 	elseif &filetype == 'markdown'
 		""exec "!~/.vim/markdown.pl % > %.html &"
 		""exec "!firefox %.html &"
-		exec ":MarkdownfPreview"
+		exec ":MarkdownPreview"
 	endif
 endfunc
 """""""""""""""""""
