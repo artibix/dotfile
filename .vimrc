@@ -331,3 +331,8 @@ inoremap ) <ESC>:call RemoveNextDoubleChar(')')<CR>a
 inoremap ] <ESC>:call RemoveNextDoubleChar(']')<CR>a
 inoremap } <ESC>:call RemoveNextDoubleChar('}')<CR>a
 inoremap > <ESC>:call RemoveNextDoubleChar('>')<CR>a
+
+""""""""""""
+" my autocmd
+""""""""""""
+autocmd BufReadPost * normal! g`"
