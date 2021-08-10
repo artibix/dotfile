@@ -27,11 +27,16 @@ set tabstop=4
 set softtabstop=4
 set showmatch
 set autoread
-
+let mapleader=','
 "set cursorcolumn
 "highlight CursorColumn cterm=NONE ctermbg=white ctermfg=green guibg=NONE guifg=NONE
 
-set foldmethod=manual "set default foldmethod
+augroup vimrc
+  au BufReadPre * setlocal foldmethod=indent
+  au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
+augroup END
+"set foldmethod=syntax "set default foldmethod
+"set foldlevelstart=99
 "manual				手工定义折叠
 "indent					更多的缩进表示更高级别的折叠
 "expr					用表达式来定义折叠
@@ -192,6 +197,18 @@ au BufWrite * :FixWhitespace
 
 Plugin 'iamcco/mathjax-support-for-mkdp'
 Plugin 'iamcco/markdown-preview.vim'
+
+""""""""""""""""""""""
+"vim-easy-align      "
+""""""""""""""""""""""
+
+Plugin 'junegunn/vim-easy-align'
+
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
 
 "Vundle end
 """"""""""""""""""""""
