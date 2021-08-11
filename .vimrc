@@ -83,7 +83,7 @@ Plugin 'VundleVim/Vundle.vim'
 
 Plugin 'Chiel92/vim-autoformat'
 noremap  <F3> :Autoformat <CR>
-exec "au BufWrite *.py,*.php,*.c,*.java :Autoformat"
+au BufWrite *.py,*.php,*.c,*.java :Autoformat
 """"""""""""
 " plugin nerdtree
 """"""""""""
@@ -210,6 +210,13 @@ xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
 
+""""""""""""""""""""""
+"pangu               "
+""""""""""""""""""""""
+
+Bundle "hotoo/pangu.vim"
+
+""""""""""""""""""""""
 "Vundle end
 """"""""""""""""""""""
 
