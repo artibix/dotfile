@@ -36,7 +36,7 @@ augroup vimrc
   au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
 augroup END
 "set foldmethod=syntax "set default foldmethod
-"set foldlevelstart=99
+""set foldlevelstart=99
 "manual				手工定义折叠
 "indent					更多的缩进表示更高级别的折叠
 "expr					用表达式来定义折叠
@@ -321,12 +321,12 @@ cnoremap <C-e> <End>
 """""""
 " complete
 """"""
-inoremap ( ()<LEFT>
-inoremap [ []<LEFT>
-inoremap { {}<LEFT>
-inoremap " ""<LEFT>
-inoremap ' ''<LEFT>
-inoremap < <><LEFT>
+"inoremap ( ()<LEFT>
+"inoremap [ []<LEFT>
+"inoremap { {}<LEFT>
+"inoremap " ""<LEFT>
+"inoremap ' ''<LEFT>
+"inoremap < <><LEFT>
 
 function! RemovePairs()
 	let s:line = getline(".")
@@ -365,10 +365,10 @@ function! RemoveNextDoubleChar(char)
 endfunction
 
 inoremap <BS> <ESC>:call RemovePairs()<CR>a
-inoremap ) <ESC>:call RemoveNextDoubleChar(')')<CR>a
-inoremap ] <ESC>:call RemoveNextDoubleChar(']')<CR>a
-inoremap } <ESC>:call RemoveNextDoubleChar('}')<CR>a
-inoremap > <ESC>:call RemoveNextDoubleChar('>')<CR>a
+"inoremap ) <ESC>:call RemoveNextDoubleChar(')')<CR>a
+"inoremap ] <ESC>:call RemoveNextDoubleChar(']')<CR>a
+"inoremap } <ESC>:call RemoveNextDoubleChar('}')<CR>a
+""inoremap > <ESC>:call RemoveNextDoubleChar('>')<CR>a
 
 """"""""""""
 " my autocmd
