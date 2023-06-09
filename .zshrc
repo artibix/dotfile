@@ -17,7 +17,7 @@ fi
 if [[ -f ~/.autojump/etc/profile.d/autojump.sh ]]; then
   . ~/.autojump/etc/profile.d/autojump.sh
 else
-  git clone git://github.com/wting/autojump.git ~/.zsh/autojump
+  git clone https://github.com/wting/autojump.git ~/.zsh/autojump
   cd ~/.zsh/autojump && ./install.py
   . ~/.autojump/etc/profile.d/autojump.sh
 fi
@@ -49,25 +49,37 @@ export FZF_DEFAULT_OPTS="--ansi --preview '(highlight -O ansi -l {} 2> /dev/null
 #------------------------------
 # History stuff
 #------------------------------
-HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
+#setopt EXTENDED_HISTORY
+export HISTFILE=~/.zsh_history
+setopt HIST_IGNORE_DUPS
+#HISTTIMEFORMAT="%Y-%m-%d %T "
+export HISTSIZE=10000
+export SAVEHIST=10000
 # 历史指令直接使用-i,-E,-D参数就可以读取每条指令的时间了
 
 #------------------------------
-# Variables
+# Local Variables
 #------------------------------
 NPM_PACKAGES="${HOME}/.npm-packages"
 export PATH="$PATH:$NPM_PACKAGES/bin"
+export PATH="$PATH:/home/artibix/.local/bin"
+
 # Preserve MANPATH if you already defined it somewhere in your config.
 # Otherwise, fall back to `manpath` so we can inherit from `/etc/manpath`.
-export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
+#export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
+
 export BROWSER="/usr/bin/google-chrome-stable"
 export EDITOR="vim"
-export PATH="${PATH}:"
-#export http_proxy='http://localhost:8888'
-#export https_proxy='http://localhost:8888'
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#5faf87"
+export hostip="localhost"
+
+## Hadoop
+export HADOOP_HOME=/home/artibix/hadoop-3.3.5
+export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
+
+# flume
+export PATH=$PATH:/home/artibix/apache-flume-1.11.0-bin/bin
 
 #-----------------------------
 # Dircolors
@@ -91,7 +103,7 @@ bindkey "^[[F" end-of-line                            # [End]　行末
 
 bindkey "\E[1~" beginning-of-line
 bindkey "\E[4~" end-of-line
-bindkey "\e[3~" delete-char
+bindkey "\E[3~" delete-char
 # 自带的常用快捷键有
 # [ctrl-u] 清空当前行
 # [ctrl-l] 清空屏幕
@@ -128,7 +140,7 @@ alias ga='git add'
 alias gst='git status'
 alias gp='git push'
 
-# manjaro
+# manjaro/arch
 alias ls="ls --color -F"
 alias ll="ls --color -lh"
 alias spm="sudo pacman"
@@ -137,6 +149,10 @@ alias cat='bat'
 alias cp='cp -i'
 alias sys='systemctl'
 
+# windows
+alias subl='subl.exe'
+alias nodepad='nodepad.exe'
+alias explorer=explorer.exe
 #------------------------------
 # ShellFuncs
 #------------------------------
@@ -215,8 +231,6 @@ autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
-
-
 setprompt() {
   setopt prompt_subst
 
@@ -232,7 +246,7 @@ ${YS_VCS_PROMPT_PREFIX2}%b\
 ${YS_VCS_PROMPT_DIRTY}%u${YS_VCS_PROMPT_CLEAN}%c"
       ssh_info () {
         if [[ -n "$SSH_CLIENT"  ||  -n "$SSH2_CLIENT" ]]; then
-          p_host='%F{yellow}%M%f'
+          p_host='%F{yellow}(remote)%M%f'
         else
           p_host='%F{green}%M%f'
         fi
@@ -276,3 +290,53 @@ ${venv_info}\
 PS2=$'%_>'
 }
 setprompt
+
+
+#------------------------------
+# WSL2 auto start services && variable
+#------------------------------
+if [[ "`uname -r`" == *"WSL"* ]]; then
+  cd ~
+  bindkey "^A" beginning-of-line
+  bindkey "^E" end-of-line
+
+  export hostip=$(cat /etc/resolv.conf |grep -oP '(?<=nameserver\ ).*')
+
+  echo "Detects that your system is a wsl, and some services are automatically started"
+  if ! pgrep crond > /dev/null; then
+    echo "start crond with sudo"
+    sudo crond
+  else
+    echo "crond is running"
+  fi
+  if ! pgrep -x "sshd" > /dev/null; then
+    echo "start sshd with sudo"
+    sudo /usr/bin/sshd
+  else
+    echo "sshd is running"
+  fi
+fi
+
+#------------------------------
+# Proxy
+#------------------------------
+proxy () {
+    export https_proxy="http://${hostip}:8888"
+    export http_proxy="http://${hostip}:8888"
+    echo "HTTP Proxy on: ${hostip}"
+}
+
+noproxy () {
+    unset http_proxy
+    unset https_proxy
+    unset all_proxy
+    echo "HTTP Proxy off"
+}
+proxy
+
+#------------------------------
+# auto start tmux
+#------------------------------
+if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+    tmux attach-session -t default || tmux new-session -s default
+fi
