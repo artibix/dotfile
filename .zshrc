@@ -34,6 +34,11 @@ if [[ -f ~/.fzf.zsh ]]; then
 else
   git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf &&  ~/.fzf/install
 fi
+
+#------------------------------
+# fzf
+#------------------------------
+
 export FZF_DEFAULT_COMMAND='fd --type f --exclude ".git" --exclude "node_modules" . --color=always'
 export FZF_DEFAULT_OPTS="--ansi --preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'"
 
@@ -49,20 +54,27 @@ export FZF_DEFAULT_OPTS="--ansi --preview '(highlight -O ansi -l {} 2> /dev/null
 #------------------------------
 # History stuff
 #------------------------------
-#setopt EXTENDED_HISTORY
+
+export HISTTIMEFORMAT="%F %T "
 export HISTFILE=~/.zsh_history
 setopt HIST_IGNORE_DUPS
-#HISTTIMEFORMAT="%Y-%m-%d %T "
 export HISTSIZE=10000
 export SAVEHIST=10000
-# 历史指令直接使用-i,-E,-D参数就可以读取每条指令的时间了
+
+# 窗口之间共享历史命令？
+setopt inc_append_history
 
 #------------------------------
 # Local Variables
 #------------------------------
+
+# node/npm
 NPM_PACKAGES="${HOME}/.npm-packages"
 export PATH="$PATH:$NPM_PACKAGES/bin"
-export PATH="$PATH:/home/artibix/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"
+
+# yarn
+export PATH="$PATH:$HOME/.yarn/bin"
 
 # Preserve MANPATH if you already defined it somewhere in your config.
 # Otherwise, fall back to `manpath` so we can inherit from `/etc/manpath`.
@@ -74,23 +86,29 @@ export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#5faf87"
 export hostip="localhost"
 
 ## Hadoop
-export HADOOP_HOME=/home/artibix/hadoop-3.3.5
-export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
+# export HADOOP_HOME=/home/artibix/hadoop-3.3.5
+# export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+# export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
 
-# flume
-export PATH=$PATH:/home/artibix/apache-flume-1.11.0-bin/bin
+# Flume
+# export PATH=$PATH:/home/artibix/apache-flume-1.11.0-bin/bin
+
+# Go
+export GOPATH=$HOME/code/go
+
+# for coding
+export SASS_BINARY_SITE=http://npm.taobao.org/mirrors/node-sass yarn
 
 #-----------------------------
 # Dircolors
 #-----------------------------
+
 LS_COLORS='rs=0:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:ex=01;32:';
 export LS_COLORS
 
 #------------------------------
 # Keybindings
 #------------------------------
-# bindkey -e
 
 bindkey "^[[1;5C" forward-word                        # ctrl-rightArrow 向前移动一个单词，以空格为标准
 bindkey "^[[1;5D" backward-word                       # ctrl-leftArrow　向后移动一个单词
@@ -104,6 +122,7 @@ bindkey "^[[F" end-of-line                            # [End]　行末
 bindkey "\E[1~" beginning-of-line
 bindkey "\E[4~" end-of-line
 bindkey "\E[3~" delete-char
+
 # 自带的常用快捷键有
 # [ctrl-u] 清空当前行
 # [ctrl-l] 清空屏幕
@@ -144,8 +163,8 @@ alias gp='git push'
 alias ls="ls --color -F"
 alias ll="ls --color -lh"
 alias spm="sudo pacman"
-alias rm='trash'
-alias cat='bat'
+alias rm='echo "This is not the command you are looking for."; false'
+# alias cat='bat'
 alias cp='cp -i'
 alias sys='systemctl'
 
@@ -153,6 +172,10 @@ alias sys='systemctl'
 alias subl='subl.exe'
 alias nodepad='nodepad.exe'
 alias explorer=explorer.exe
+
+# for coding
+alias sail='bash vendor/bin/sail'
+
 #------------------------------
 # ShellFuncs
 #------------------------------
@@ -166,7 +189,7 @@ man() {
     LESS_TERMCAP_so=$(printf "\e[1;44;33m") \
     LESS_TERMCAP_ue=$(printf "\e[0m") \
     LESS_TERMCAP_us=$(printf "\e[1;32m") \
-    man "$@"
+    man -L zh_CN "$@"
   }
 
 #------------------------------
@@ -302,19 +325,19 @@ if [[ "`uname -r`" == *"WSL"* ]]; then
 
   export hostip=$(cat /etc/resolv.conf |grep -oP '(?<=nameserver\ ).*')
 
-  echo "Detects that your system is a wsl, and some services are automatically started"
-  if ! pgrep crond > /dev/null; then
-    echo "start crond with sudo"
-    sudo crond
-  else
-    echo "crond is running"
-  fi
-  if ! pgrep -x "sshd" > /dev/null; then
-    echo "start sshd with sudo"
-    sudo /usr/bin/sshd
-  else
-    echo "sshd is running"
-  fi
+  # echo "Detects that your system is a wsl, and some services are automatically started"
+  # if ! pgrep crond > /dev/null; then
+  #   echo "start crond with sudo"
+  #   sudo crond
+  # else
+  #   echo "crond is running"
+  # fi
+  # if ! pgrep -x "sshd" > /dev/null; then
+  #   echo "start sshd with sudo"
+  #   sudo /usr/bin/sshd
+  # else
+  #   echo "sshd is running"
+  # fi
 fi
 
 #------------------------------
@@ -340,3 +363,8 @@ proxy
 if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
     tmux attach-session -t default || tmux new-session -s default
 fi
+
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
