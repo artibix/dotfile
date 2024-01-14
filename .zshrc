@@ -4,6 +4,30 @@
 # Author:   manu2x@qq.com                                          #
 #------------------------------------------------------------------#
 
+#-----------------
+# zplug
+#-----------------
+
+if [[ -f ~/.zplug/init.zsh ]]; then
+  source ~/.zplug/init.zsh
+else
+  curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh 
+  source ~/.zplug/init.zsh
+fi
+
+# Load theme file
+zplug 'dracula/zsh', as:theme
+
+# Install plugins if there are plugins that have not been installed
+if ! zplug check --verbose; then
+    printf "Install? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+# Then, source plugins and add commands to $PATH
+zplug load --verbose
+
 #-----------------------------
 # Source some stuff
 #-----------------------------
@@ -231,7 +255,7 @@ case $TERM in
     }
   preexec () { print -Pn "\e]0;[%n@%M][%~]%# ($1)\a" }
   ;;
-screen|screen-256color)
+screen|screen-256color|tmux-256color)
   precmd () {
     vcs_info
     print -Pn "\e]83;title \"$1\"\a"
@@ -255,7 +279,7 @@ zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
 setprompt() {
-  setopt prompt_subst
+ setopt prompt_subst
 
   # VCS
   YS_VCS_PROMPT_PREFIX1=" %{$fg[white]%}on%{$reset_color%} "
@@ -264,29 +288,17 @@ setprompt() {
   YS_VCS_PROMPT_DIRTY=" %{$fg[red]%}"
   YS_VCS_PROMPT_CLEAN="%{$fg[green]%}"
 
-  zstyle ':vcs_info:git*' formats "${YS_VCS_PROMPT_PREFIX1}git\
+zstyle ':vcs_info:git*' formats "${YS_VCS_PROMPT_PREFIX1}git\
 ${YS_VCS_PROMPT_PREFIX2}%b\
 ${YS_VCS_PROMPT_DIRTY}%u${YS_VCS_PROMPT_CLEAN}%c"
-      ssh_info () {
-        if [[ -n "$SSH_CLIENT"  ||  -n "$SSH2_CLIENT" ]]; then
-          p_host='%F{yellow}(remote)%M%f'
-        else
-          p_host='%F{green}%M%f'
-        fi
-      }
-    ssh_info
-
-
-# Virtualenv
-local venv_info='$(virtenv_prompt)'
-YS_THEME_VIRTUALENV_PROMPT_PREFIX=" %{$fg[green]%}"
-YS_THEME_VIRTUALENV_PROMPT_SUFFIX=" %{$reset_color%}%"
-virtenv_prompt() {
-  [[ -n ${VIRTUAL_ENV} ]] || return
-  echo "${YS_THEME_VIRTUALENV_PROMPT_PREFIX}${VIRTUAL_ENV:t}${YS_THEME_VIRTUALENV_PROMPT_SUFFIX}"
-}
-
-local exit_code="%(?,,C:%{$fg[red]%}%?%{$reset_color%})"
+  ssh_info () {
+    if [[ -n "$SSH_CLIENT"  ||  -n "$SSH2_CLIENT" ]]; then
+      p_host='%F{yellow}(remote)%M%f'
+    else
+      p_host='%F{green}%M%f'
+    fi
+  }
+  ssh_info
 
 # Prompt format:
 #
@@ -297,7 +309,7 @@ local exit_code="%(?,,C:%{$fg[red]%}%?%{$reset_color%})"
 #
 # % ys @ ys-mbp in ~/.oh-my-zsh on git:master x [21:47:42] C:0
 # $
-PROMPT="
+  PROMPT="
 %{$terminfo[bold]$fg[blue]%}#%{$reset_color%} \
 %(#,%{$bg[yellow]%}%{$fg[black]%}%n%{$reset_color%},%{$fg[cyan]%}%n) \
 %{$fg[white]%}@ \
@@ -306,11 +318,11 @@ ${p_host} \
 %{$terminfo[bold]$fg[yellow]%}%~%{$reset_color%}\
 ${venv_info}\
 \${vcs_info_msg_0_}\
-\
- %{$fg[white]%}[%*] $exit_code
+ \
+%{$fg[white]%}[%*] $exit_code
 %{$terminfo[bold]$fg[yellow]%}-> %{$reset_color%}"
 
-PS2=$'%_>'
+  PS2=$'%_>'
 }
 setprompt
 
