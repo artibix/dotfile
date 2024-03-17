@@ -1,8 +1,21 @@
 #------------------------------------------------------------------#
 # File:     .zshrc   ZSH resource file                             #
-# Version:  1.１                                                   #
+# Version:  1.2                                                    #
 # Author:   manu2x@qq.com                                          #
 #------------------------------------------------------------------#
+
+
+#------------------------------
+# auto start tmux
+#------------------------------
+if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+    tmux attach-session -t default || tmux new-session -s default
+fi
+
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
 
 #-----------------
 # zplug
@@ -31,6 +44,7 @@ zplug load --verbose
 #-----------------------------
 # Source some stuff
 #-----------------------------
+
 if [[ -f ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
   . ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 else
@@ -350,33 +364,23 @@ if [[ "`uname -r`" == *"WSL"* ]]; then
   # else
   #   echo "sshd is running"
   # fi
+  # https://github.com/arkane-systems/genie
 fi
 
 #------------------------------
 # Proxy
 #------------------------------
-proxy () {
+
+setproxy () {
     export https_proxy="http://${hostip}:8888"
     export http_proxy="http://${hostip}:8888"
     echo "HTTP Proxy on: ${hostip}"
 }
 
-noproxy () {
+unsetproxy () {
     unset http_proxy
     unset https_proxy
     unset all_proxy
     echo "HTTP Proxy off"
 }
-proxy
-
-#------------------------------
-# auto start tmux
-#------------------------------
-if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-    tmux attach-session -t default || tmux new-session -s default
-fi
-
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-
+setproxy
