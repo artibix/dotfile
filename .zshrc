@@ -12,9 +12,12 @@ if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
     tmux attach-session -t default || tmux new-session -s default
 fi
 
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+if which pyenv > /dev/null; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init -)"
+fi
+
 
 
 #-----------------
@@ -380,7 +383,7 @@ if which termux-info > /dev/null; then
   fi
   if ! pgrep -x "sshd" > /dev/null; then
     echo "start sshd with sudo"
-    sudo /usr/bin/sshd
+    sshd
   else
     echo "sshd is running"
   fi
