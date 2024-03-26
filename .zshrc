@@ -370,7 +370,7 @@ fi
 #------------------------------
 # Termux auto start services && variable
 #------------------------------
-if which termux-info > /dev/null; then=
+if which termux-info > /dev/null; then
   echo "Detects that your system is a termux, and some services are automatically started"
   if ! pgrep crond > /dev/null; then
     echo "start crond with sudo"
