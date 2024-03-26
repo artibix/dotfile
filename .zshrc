@@ -368,6 +368,26 @@ if [[ "`uname -r`" == *"WSL"* ]]; then
 fi
 
 #------------------------------
+# Termux auto start services && variable
+#------------------------------
+if which termux-info > /dev/null; then=
+  echo "Detects that your system is a termux, and some services are automatically started"
+  if ! pgrep crond > /dev/null; then
+    echo "start crond with sudo"
+    sudo crond
+  else
+    echo "crond is running"
+  fi
+  if ! pgrep -x "sshd" > /dev/null; then
+    echo "start sshd with sudo"
+    sudo /usr/bin/sshd
+  else
+    echo "sshd is running"
+  fi
+  # https://github.com/arkane-systems/genie
+fi
+
+#------------------------------
 # Proxy
 #------------------------------
 
