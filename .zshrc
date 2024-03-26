@@ -377,7 +377,7 @@ if which termux-info > /dev/null; then
   echo "Detects that your system is a termux, and some services are automatically started"
   if ! pgrep crond > /dev/null; then
     echo "start crond with sudo"
-    sudo crond
+    crond
   else
     echo "crond is running"
   fi
