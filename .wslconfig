@@ -1,0 +1,12 @@
+[wsl2]
+memory=4GB 
+processors=2
+#localhostForwarding=true
+guiApplications=false
+
+[experimental]
+autoMemoryReclaim=gradual  # gradual  | dropcache | disabled
+networkingMode=mirrored
+dnsTunneling=true
+firewall=true
+autoProxy=true
