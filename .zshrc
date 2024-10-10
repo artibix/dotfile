@@ -1,24 +1,21 @@
 #------------------------------------------------------------------#
 # File:     .zshrc   ZSH resource file                             #
-# Version:  1.2                                                    #
 # Author:   manu2x@qq.com                                          #
 #------------------------------------------------------------------#
-
 
 #------------------------------
 # auto start tmux
 #------------------------------
-if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-    tmux attach-session -t default || tmux new-session -s default
-fi
+
+#if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+#    tmux attach-session -t default || tmux new-session -s default
+#fi
 
 if which pyenv > /dev/null; then
   export PYENV_ROOT="$HOME/.pyenv"
   export PATH="$PYENV_ROOT/bin:$PATH"
   eval "$(pyenv init -)"
 fi
-
-
 
 #-----------------
 # zplug
@@ -41,6 +38,7 @@ if ! zplug check --verbose; then
         echo; zplug install
     fi
 fi
+
 # Then, source plugins and add commands to $PATH
 zplug load --verbose
 
@@ -110,7 +108,9 @@ setopt inc_append_history
 #------------------------------
 
 # node/npm
-NPM_PACKAGES="${HOME}/.npm-packages"
+
+NPM_PACKAGES="${HOME}/.npm-global"
+npm config set prefix $NPM_PACKAGES
 export PATH="$PATH:$NPM_PACKAGES/bin"
 export PATH="$PATH:$HOME/.local/bin"
 
@@ -208,7 +208,7 @@ alias rm='echo "This is not the command you are looking for."; false'
 # alias cat='bat'
 alias cp='cp -i'
 alias sys='systemctl'
-
+alias tp='trash-put'
 # windows
 alias subl='subl.exe'
 alias nodepad='nodepad.exe'
@@ -216,6 +216,7 @@ alias explorer=explorer.exe
 
 # for coding
 alias sail='bash vendor/bin/sail'
+alias nv='nvim'
 
 #------------------------------
 # ShellFuncs
@@ -348,26 +349,8 @@ setprompt
 # WSL2 auto start services && variable
 #------------------------------
 if [[ "`uname -r`" == *"WSL"* ]]; then
-  cd ~
   bindkey "^A" beginning-of-line
   bindkey "^E" end-of-line
-
-  export hostip=$(cat /etc/resolv.conf |grep -oP '(?<=nameserver\ ).*')
-
-  # echo "Detects that your system is a wsl, and some services are automatically started"
-  # if ! pgrep crond > /dev/null; then
-  #   echo "start crond with sudo"
-  #   sudo crond
-  # else
-  #   echo "crond is running"
-  # fi
-  # if ! pgrep -x "sshd" > /dev/null; then
-  #   echo "start sshd with sudo"
-  #   sudo /usr/bin/sshd
-  # else
-  #   echo "sshd is running"
-  # fi
-  # https://github.com/arkane-systems/genie
 fi
 
 #------------------------------

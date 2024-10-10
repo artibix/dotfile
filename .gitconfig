@@ -1,6 +1,6 @@
 [user]
-	name = yangchaohe
-	email = manu2x@qq.com
+	name = artibix
+	email = artibix@proton.me
 [alias]
 	lg = log --color --oneline --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 	st = status
@@ -20,3 +20,25 @@
 [core]
 	quotepath = false 
 	# status引用路径不再是八进制（反过来说就是允许显示中文了）
+[difftool "sourcetree"]
+	cmd = "'' "
+[mergetool "sourcetree"]
+	cmd = "'' "
+	trustExitCode = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[init]
+	defaultBranch = main
+# 导入其他目录的配置会覆盖掉之前的，所以导入的配置必须放在下面
+[includeIf "gitdir/i:D:/Code/Work/"]
+    path = .gitconfig-work
+[includeIf "gitdir/i:%(prefix)///192.168.0.104/Work/"]
+    path = .gitconfig-work
+[safe]
+	directory = %(prefix)///192.168.0.104/Work/qzg-superior
+	directory = %(prefix)///192.168.0.104/Work/banxi
+	directory = %(prefix)///192.168.0.104/Work/banxi
+
