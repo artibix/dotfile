@@ -344,6 +344,11 @@ ${venv_info}\
 }
 setprompt
 
+set-simple-prompt () {
+  PROMPT="%{$fg[green]%}➜ %{$fg[blue]%}%~%  "
+  PS2=$'%_>'
+}
+
 
 #------------------------------
 # WSL2 auto start services && variable
