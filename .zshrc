@@ -242,7 +242,6 @@ zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
 
 
-
 setprompt() {
  setopt prompt_subst
 
