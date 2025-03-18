@@ -17,7 +17,7 @@ fi
 if [[ -f ~/.autojump/etc/profile.d/autojump.sh ]]; then
   . ~/.autojump/etc/profile.d/autojump.sh
 else
-  git clone git://github.com/wting/autojump.git ~/.zsh/autojump
+  git clone https://github.com/wting/autojump.git ~/.zsh/autojump
   cd ~/.zsh/autojump && ./install.py
   . ~/.autojump/etc/profile.d/autojump.sh
 fi
@@ -184,7 +184,7 @@ man() {
 #------------------------------
 autoload -U promptinit
 promptinit
-zmodload zsh/complist 
+zmodload zsh/complist
 autoload -Uz compinit
 compinit
 zstyle :compinstall filename '${HOME}/.zshrc'
@@ -215,20 +215,20 @@ case $TERM in
     precmd () {
       vcs_info
       print -Pn "\e]0;[%n@%M][%~]%#\a"
-    } 
+    }
     preexec () { print -Pn "\e]0;[%n@%M][%~]%# ($1)\a" }
     ;;
   screen|screen-256color)
-    precmd () { 
+    precmd () {
       vcs_info
-      print -Pn "\e]83;title \"$1\"\a" 
-      print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~]\a" 
+      print -Pn "\e]83;title \"$1\"\a"
+      print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~]\a"
     }
-    preexec () { 
-      print -Pn "\e]83;title \"$1\"\a" 
-      print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~] ($1)\a" 
+    preexec () {
+      print -Pn "\e]83;title \"$1\"\a"
+      print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~] ($1)\a"
     }
-    ;; 
+    ;;
 esac
 
 #------------------------------
@@ -257,7 +257,7 @@ zstyle ':vcs_info:git*' formats "${YS_VCS_PROMPT_PREFIX1}git\
 ${YS_VCS_PROMPT_PREFIX2}%b\
 ${YS_VCS_PROMPT_DIRTY}%u${YS_VCS_PROMPT_CLEAN}%c"
   ssh_info () {
-    if [[ -n "$SSH_CLIENT"  ||  -n "$SSH2_CLIENT" ]]; then 
+    if [[ -n "$SSH_CLIENT"  ||  -n "$SSH2_CLIENT" ]]; then
     p_host='%F{yellow}%M%f'
   else
     p_host='%F{green}%M%f'
@@ -302,4 +302,3 @@ ${venv_info}\
  PS2=$'%_>'
 }
 setprompt
-

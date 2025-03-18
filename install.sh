@@ -87,10 +87,10 @@ else
   echo -e "${RED}nvim 目录不存在于dotfiles目录${NC}"
 fi
 
-if [ -d "$DOTFILES_DIR/.fdignore" ]; then
+if [ -f "$DOTFILES_DIR/.fdignore" ]; then
   create_symlink "$DOTFILES_DIR/.fdignore" "$HOME_DIR/.fdignore"
 else
-  echo -e "${RED}nvim 目录不存在于dotfiles目录${NC}"
+  echo -e "${RED}.fdignore 不存在于dotfiles目录${NC}"
 fi
 
 echo -e "${GREEN}dotfiles安装完成!${NC}"
