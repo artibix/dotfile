@@ -1,12 +1,51 @@
 #------------------------------------------------------------------#
 # File:     .zshrc   ZSH resource file                             #
-# Version:  1.0                                                    #
 # Author:   manu2x@qq.com                                          #
 #------------------------------------------------------------------#
+
+#------------------------------
+# auto start tmux
+#------------------------------
+
+#if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+#    tmux attach-session -t default || tmux new-session -s default
+#fi
+
+if which pyenv > /dev/null; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init -)"
+fi
+
+#-----------------
+# zplug
+#-----------------
+
+if [[ -f ~/.zplug/init.zsh ]]; then
+  source ~/.zplug/init.zsh
+else
+  curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh 
+  source ~/.zplug/init.zsh
+fi
+
+# Load theme file
+zplug 'dracula/zsh', as:theme
+
+# Install plugins if there are plugins that have not been installed
+if ! zplug check --verbose; then
+    printf "Install? [y/N]: "
+    if read -q; then
+        echo; zplug install
+    fi
+fi
+
+# Then, source plugins and add commands to $PATH
+zplug load --verbose
 
 #-----------------------------
 # Source some stuff
 #-----------------------------
+
 if [[ -f ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
   . ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 else
@@ -29,139 +68,155 @@ else
   . ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
 
+if [[ -f ~/.fzf.zsh ]]; then
+  source ~/.fzf.zsh
+else
+  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf &&  ~/.fzf/install
+fi
+
+#------------------------------
+# fzf
+#------------------------------
+
+export FZF_DEFAULT_COMMAND='fd --type f --exclude ".git" --exclude "node_modules" . --color=always'
+export FZF_DEFAULT_OPTS="--ansi --preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'"
+
+# fzf常见用法：
+# ctrl+r 历史指令
+# ctrl+t 启动fzf
+# alt+c cd
+# vim **<tab>
+# kill -9 **<tab>
+# ssh **<tab>
+# export **
+
 #------------------------------
 # History stuff
 #------------------------------
-HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
-# 历史指令直接使用-i,-E,-D参数就可以读取每条指令的时间了
+
+export HISTTIMEFORMAT="%F %T "
+export HISTFILE=~/.zsh_history
+setopt HIST_IGNORE_DUPS
+export HISTSIZE=10000
+export SAVEHIST=10000
+
+# 窗口之间共享历史命令？
+setopt inc_append_history
 
 #------------------------------
-# Variables
+# Local Variables
 #------------------------------
+
+# node/npm
+
+NPM_PACKAGES="${HOME}/.npm-global"
+npm config set prefix $NPM_PACKAGES
+export PATH="$PATH:$NPM_PACKAGES/bin"
+export PATH="$PATH:$HOME/.local/bin"
+
+# yarn
+export PATH="$PATH:$HOME/.yarn/bin"
+
+# Preserve MANPATH if you already defined it somewhere in your config.
+# Otherwise, fall back to `manpath` so we can inherit from `/etc/manpath`.
+#export MANPATH="${MANPATH-$(manpath)}:$NPM_PACKAGES/share/man"
+
 export BROWSER="/usr/bin/google-chrome-stable"
 export EDITOR="vim"
-export PATH="${PATH}:"
-export http_proxy='localhost:8888'
-export https_proxy='localhost:8080'
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#5faf87"
+export hostip="localhost"
+
+## Hadoop
+# export HADOOP_HOME=/home/artibix/hadoop-3.3.5
+# export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+# export JAVA_HOME=/usr/lib/jvm/java-11-openjdk
+
+# Flume
+# export PATH=$PATH:/home/artibix/apache-flume-1.11.0-bin/bin
+
+# Go
+export GOPATH=$HOME/code/go
+
+# for coding
+export SASS_BINARY_SITE=http://npm.taobao.org/mirrors/node-sass yarn
 
 #-----------------------------
 # Dircolors
 #-----------------------------
+
 LS_COLORS='rs=0:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:ex=01;32:';
 export LS_COLORS
 
 #------------------------------
 # Keybindings
 #------------------------------
-# Use emacs key bindings
-bindkey -e
 
-# [PageUp] - Up a line of history
-if [[ -n "${terminfo[kpp]}" ]]; then
-  bindkey -M emacs "${terminfo[kpp]}" up-line-or-history
-  bindkey -M viins "${terminfo[kpp]}" up-line-or-history
-  bindkey -M vicmd "${terminfo[kpp]}" up-line-or-history
-fi
-# [PageDown] - Down a line of history
-if [[ -n "${terminfo[knp]}" ]]; then
-  bindkey -M emacs "${terminfo[knp]}" down-line-or-history
-  bindkey -M viins "${terminfo[knp]}" down-line-or-history
-  bindkey -M vicmd "${terminfo[knp]}" down-line-or-history
-fi
+bindkey "^[[1;5C" forward-word                        # ctrl-rightArrow 向前移动一个单词，以空格为标准
+bindkey "^[[1;5D" backward-word                       # ctrl-leftArrow　向后移动一个单词
+bindkey "^[[A" history-beginning-search-backward      # ^ 根据输入的字符向后查找历史指令
+bindkey "^[[B" history-beginning-search-forward       # v 向前搜索
+bindkey "^[[C" forward-char                           # >
+bindkey "^[[D" backward-char                          # <
+bindkey "^[[H" beginning-of-line                      # [Home] 行首
+bindkey "^[[F" end-of-line                            # [End]　行末
 
-# Start typing + [Up-Arrow] - fuzzy find history forward
-if [[ -n "${terminfo[kcuu1]}" ]]; then
-  autoload -U up-line-or-beginning-search
-  zle -N up-line-or-beginning-search
+bindkey "\E[1~" beginning-of-line
+bindkey "\E[4~" end-of-line
+bindkey "\E[3~" delete-char
 
-  bindkey -M emacs "${terminfo[kcuu1]}" up-line-or-beginning-search
-  bindkey -M viins "${terminfo[kcuu1]}" up-line-or-beginning-search
-  bindkey -M vicmd "${terminfo[kcuu1]}" up-line-or-beginning-search
-fi
-# Start typing + [Down-Arrow] - fuzzy find history backward
-if [[ -n "${terminfo[kcud1]}" ]]; then
-  autoload -U down-line-or-beginning-search
-  zle -N down-line-or-beginning-search
-
-  bindkey -M emacs "${terminfo[kcud1]}" down-line-or-beginning-search
-  bindkey -M viins "${terminfo[kcud1]}" down-line-or-beginning-search
-  bindkey -M vicmd "${terminfo[kcud1]}" down-line-or-beginning-search
-fi
-
-# [Home] - Go to beginning of line
-if [[ -n "${terminfo[khome]}" ]]; then
-  bindkey -M emacs "${terminfo[khome]}" beginning-of-line
-  bindkey -M viins "${terminfo[khome]}" beginning-of-line
-  bindkey -M vicmd "${terminfo[khome]}" beginning-of-line
-fi
-# [End] - Go to end of line
-if [[ -n "${terminfo[kend]}" ]]; then
-  bindkey -M emacs "${terminfo[kend]}"  end-of-line
-  bindkey -M viins "${terminfo[kend]}"  end-of-line
-  bindkey -M vicmd "${terminfo[kend]}"  end-of-line
-fi
-
-# [Shift-Tab] - move through the completion menu backwards
-if [[ -n "${terminfo[kcbt]}" ]]; then
-  bindkey -M emacs "${terminfo[kcbt]}" reverse-menu-complete
-  bindkey -M viins "${terminfo[kcbt]}" reverse-menu-complete
-  bindkey -M vicmd "${terminfo[kcbt]}" reverse-menu-complete
-fi
-
-# [Backspace] - delete backward
-bindkey -M emacs '^?' backward-delete-char
-bindkey -M viins '^?' backward-delete-char
-bindkey -M vicmd '^?' backward-delete-char
-# [Delete] - delete forward
-if [[ -n "${terminfo[kdch1]}" ]]; then
-  bindkey -M emacs "${terminfo[kdch1]}" delete-char
-  bindkey -M viins "${terminfo[kdch1]}" delete-char
-  bindkey -M vicmd "${terminfo[kdch1]}" delete-char
-else
-  bindkey -M emacs "^[[3~" delete-char
-  bindkey -M viins "^[[3~" delete-char
-  bindkey -M vicmd "^[[3~" delete-char
-
-  bindkey -M emacs "^[3;5~" delete-char
-  bindkey -M viins "^[3;5~" delete-char
-  bindkey -M vicmd "^[3;5~" delete-char
-fi
-
-# [Ctrl-Delete] - delete whole forward-word
-bindkey -M emacs '^[[3;5~' kill-word
-bindkey -M viins '^[[3;5~' kill-word
-bindkey -M vicmd '^[[3;5~' kill-word
-
-# [Ctrl-RightArrow] - move forward one word
-bindkey -M emacs '^[[1;5C' forward-word
-bindkey -M viins '^[[1;5C' forward-word
-bindkey -M vicmd '^[[1;5C' forward-word
-# [Ctrl-LeftArrow] - move backward one word
-bindkey -M emacs '^[[1;5D' backward-word
-bindkey -M viins '^[[1;5D' backward-word
-bindkey -M vicmd '^[[1;5D' backward-word
-
-
-bindkey '\ew' kill-region                             # [Esc-w] - Kill from the cursor to the mark
-bindkey -s '\el' 'ls\n'                               # [Esc-l] - run command: ls
-bindkey '^r' history-incremental-search-backward      # [Ctrl-r] - Search backward incrementally for a specified string. The string may begin with ^ to anchor the search to the beginning of the line.
-bindkey ' ' magic-space                               # [Space] - don't do history expansion
+# 自带的常用快捷键有
+# [ctrl-u] 清空当前行
+# [ctrl-l] 清空屏幕
+# 其他快捷键
+#option action
+#   CTRL-c  Stop current command
+#   CTRL-z  Sleep program
+#   CTRL-a  Go to start of line
+#   CTRL-e  Go to end of line
+#   CTRL-u  Cut from start of line
+#   CTRL-w  delete a word in front the Cursor
+#   CTRL-k  Cut to end of line
+#   CTRL-r  Search history
+#   CTRL + l    Clear screen
+#   CTRL + s    Stop output to screen
+#   CTRL + q    Re-enable screen output
+#   !!  Repeat last command
+#   !abc    Run last command starting with abc
+#   !abc:p  Print last command starting with abc
+#   !$  Last argument of previous command
+#   ALT-.   Last argument of previous command
+#   !*  All arguments of previous command
+#   ^abc ^123   Run previous command, replacing abc with 123
 
 
 #------------------------------
 # Alias stuff
 #------------------------------
-alias ls="ls --color -F"
-alias ll="ls --color -lh"
-alias spm="sudo pacman"
+
+# git
 alias gaa="git add --all"
-alias gcmsg='git commit -m'
+alias gci='git commit -m'
 alias ga='git add'
 alias gst='git status'
 alias gp='git push'
-alias rm='trash'
+
+# manjaro/arch
+alias ls="ls --color -F"
+alias ll="ls --color -lh"
+alias spm="sudo pacman"
+alias rm='echo "This is not the command you are looking for."; false'
+# alias cat='bat'
+alias cp='cp -i'
+alias sys='systemctl'
+alias tp='trash-put'
+# windows
+alias subl='subl.exe'
+alias nodepad='nodepad.exe'
+alias explorer=explorer.exe
+
+# for coding
+alias sail='bash vendor/bin/sail'
+alias nv='nvim'
 
 #------------------------------
 # ShellFuncs
@@ -177,8 +232,9 @@ man() {
     LESS_TERMCAP_ue=$(printf "\e[0m") \
     LESS_TERMCAP_us=$(printf "\e[1;32m") \
     man "$@"
-}
+  }
 
+export MANPAGER='nvim +Man!'
 #------------------------------
 # Comp stuff
 #------------------------------
@@ -204,7 +260,7 @@ zstyle ':completion:*:kill:*'   force-list always
 
 zstyle ':completion:*:*:killall:*' menu yes select
 zstyle ':completion:*:killall:*'   force-list always
-# 小写也能补全
+# 小写也能tab补全
 zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
 
 #------------------------------
@@ -216,19 +272,19 @@ case $TERM in
       vcs_info
       print -Pn "\e]0;[%n@%M][%~]%#\a"
     }
-    preexec () { print -Pn "\e]0;[%n@%M][%~]%# ($1)\a" }
-    ;;
-  screen|screen-256color)
-    precmd () {
-      vcs_info
-      print -Pn "\e]83;title \"$1\"\a"
-      print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~]\a"
-    }
-    preexec () {
-      print -Pn "\e]83;title \"$1\"\a"
-      print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~] ($1)\a"
-    }
-    ;;
+  preexec () { print -Pn "\e]0;[%n@%M][%~]%# ($1)\a" }
+  ;;
+screen|screen-256color|tmux-256color)
+  precmd () {
+    vcs_info
+    print -Pn "\e]83;title \"$1\"\a"
+    print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~]\a"
+  }
+preexec () {
+  print -Pn "\e]83;title \"$1\"\a"
+  print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~] ($1)\a"
+}
+;;
 esac
 
 #------------------------------
@@ -240,7 +296,6 @@ colors
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git hg
 zstyle ':vcs_info:*' check-for-changes true
-
 
 setprompt() {
  setopt prompt_subst
@@ -257,24 +312,12 @@ ${YS_VCS_PROMPT_PREFIX2}%b\
 ${YS_VCS_PROMPT_DIRTY}%u${YS_VCS_PROMPT_CLEAN}%c"
   ssh_info () {
     if [[ -n "$SSH_CLIENT"  ||  -n "$SSH2_CLIENT" ]]; then
-    p_host='%F{yellow}%M%f'
-  else
-    p_host='%F{green}%M%f'
-  fi
+      p_host='%F{yellow}(remote)%M%f'
+    else
+      p_host='%F{green}%M%f'
+    fi
   }
   ssh_info
-
-
-# Virtualenv
-local venv_info='$(virtenv_prompt)'
-YS_THEME_VIRTUALENV_PROMPT_PREFIX=" %{$fg[green]%}"
-YS_THEME_VIRTUALENV_PROMPT_SUFFIX=" %{$reset_color%}%"
-virtenv_prompt() {
-	[[ -n ${VIRTUAL_ENV} ]] || return
-	echo "${YS_THEME_VIRTUALENV_PROMPT_PREFIX}${VIRTUAL_ENV:t}${YS_THEME_VIRTUALENV_PROMPT_SUFFIX}"
-}
-
-local exit_code="%(?,,C:%{$fg[red]%}%?%{$reset_color%})"
 
 # Prompt format:
 #
@@ -285,7 +328,7 @@ local exit_code="%(?,,C:%{$fg[red]%}%?%{$reset_color%})"
 #
 # % ys @ ys-mbp in ~/.oh-my-zsh on git:master x [21:47:42] C:0
 # $
-PROMPT="
+  PROMPT="
 %{$terminfo[bold]$fg[blue]%}#%{$reset_color%} \
 %(#,%{$bg[yellow]%}%{$fg[black]%}%n%{$reset_color%},%{$fg[cyan]%}%n) \
 %{$fg[white]%}@ \
@@ -298,6 +341,86 @@ ${venv_info}\
 %{$fg[white]%}[%*] $exit_code
 %{$terminfo[bold]$fg[yellow]%}-> %{$reset_color%}"
 
- PS2=$'%_>'
+  PS2=$'%_>'
 }
 setprompt
+
+set-simple-prompt () {
+  PROMPT="%{$fg[green]%}➜ %{$fg[blue]%}%~%  "
+  PS2=$'%_>'
+}
+
+
+#------------------------------
+# WSL2 auto start services && variable
+#------------------------------
+if [[ "`uname -r`" == *"WSL"* ]]; then
+  bindkey "^A" beginning-of-line
+  bindkey "^E" end-of-line
+fi
+
+#------------------------------
+# Termux auto start services && variable
+#------------------------------
+if which termux-info > /dev/null; then
+  echo "Detects that your system is a termux, and some services are automatically started"
+  if ! pgrep crond > /dev/null; then
+    echo "start crond with sudo"
+    crond
+  else
+    echo "crond is running"
+  fi
+  if ! pgrep -x "sshd" > /dev/null; then
+    echo "start sshd with sudo"
+    sshd
+  else
+    echo "sshd is running"
+  fi
+  # https://github.com/arkane-systems/genie
+fi
+
+#------------------------------
+# Proxy
+#------------------------------
+
+setproxy () {
+    export https_proxy="http://${hostip}:8888"
+    export http_proxy="http://${hostip}:8888"
+    echo "HTTP Proxy on: ${hostip}"
+}
+
+unsetproxy () {
+    unset http_proxy
+    unset https_proxy
+    unset all_proxy
+    echo "HTTP Proxy off"
+}
+setproxy
+export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/artbix/.lmstudio/bin"
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/artbix/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/opt/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+
+
+#PATH=~/.console-ninja/.bin:$PATH___MY_VMOPTIONS_SHELL_FILE="${HOME}/.jetbrains.vmoptions.sh"; if [ -f "${___MY_VMOPTIONS_SHELL_FILE}" ]; then . "${___MY_VMOPTIONS_SHELL_FILE}"; fi
