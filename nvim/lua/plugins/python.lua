@@ -7,18 +7,31 @@ return {
     { "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } },
   },
   branch = "regexp",
+  keys = {
+    { "<leader>cv", "<cmd>VenvSelect<cr>", { desc = "Select VirtualEnv" } },
+  },
   config = function()
     require("venv-selector").setup({
       settings = {
+        options = {
+          enable_default_searches = false,
+        },
         search = {
-          find_code_venvs = {
+          anaconda3 = {
             command = "fd /bin/python$ /opt/anaconda3/envs/ --full-path",
+            tyep = "Mac:anaconda3",
+          },
+          current = {
+            command = "fd 'bin/python' /Library/Frameworks/Python.framework/ --full-path",
+            type = "MacOS",
+          },
+          venv = {
+            command = "fd 'bin/python' .venv -I --full-path",
+            type = "currentDirectoryVenv",
           },
         },
       },
     })
-    -- 添加键位映射
-    vim.keymap.set("n", "<leader>cv", "<cmd>VenvSelect<cr>", { desc = "Select VirtualEnv" })
   end,
   event = "VeryLazy",
 }
