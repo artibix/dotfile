@@ -310,7 +310,7 @@ serve() {
 ff() { find . -type f -name "*$1*" -print; }
 
 setproxy() {
-    local host="${1:-127.0.0.1}"
+    local host="${1:-localhost}"
     local port="${2:-8888}"
 
     if ! [[ "$port" =~ ^[0-9]+$ ]] || [ "$port" -lt 1 ] || [ "$port" -gt 65535 ]; then
