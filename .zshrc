@@ -439,9 +439,11 @@ esac
 #------------------------------
 # Prompt
 #------------------------------
+# Load colors and terminfo
 autoload -U colors zsh/terminfo
 colors
 
+# Setup version control info
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git hg svn
 zstyle ':vcs_info:*' check-for-changes true
@@ -450,28 +452,64 @@ zstyle ':vcs_info:git*' actionformats "%F{blue}(%F{red}%b%F{yellow}|%F{red}%a%F{
 zstyle ':vcs_info:*' stagedstr "+"
 zstyle ':vcs_info:*' unstagedstr "!"
 
+# Cache git status output to improve performance
+function git_prompt_info() {
+  # Only execute in git repositories
+  if git rev-parse --is-inside-work-tree &>/dev/null; then
+    local dirty
+    local git_status
+    local -a flags
+    local git_prompt
+
+    # Cache status result to avoid repeated calls
+    if [[ "$(command git config --get oh-my-zsh.hide-status 2>/dev/null)" != "1" ]]; then
+      git_status=$(command git status --porcelain 2>/dev/null)
+      
+      # Check for uncommitted changes
+      if [[ -n $git_status ]]; then
+        dirty=1
+        # Parse status to check for staged and unstaged changes
+        if echo "$git_status" | grep -q '^[ACDMR]'; then
+          flags+=( "%F{green}+" )
+        fi
+        if echo "$git_status" | grep -q '^.[DM]'; then
+          flags+=( "%F{red}!" )
+        fi
+      fi
+    fi
+
+    # Get branch name
+    local branch=$(git symbolic-ref HEAD 2>/dev/null)
+    branch=${branch#refs/heads/}
+
+    # Format the prompt
+    git_prompt="%F{blue}(%F{red}${branch}%F{blue})"
+    [[ -n $dirty ]] && git_prompt+="${(j::)flags}%f"
+
+    echo -n " %F{white}on%f git:$git_prompt"
+  fi
+}
+
+# Set the prompt
 setprompt() {
   setopt prompt_subst
 
-  # Define VCS prompt elements
-  YS_VCS_PROMPT_PREFIX1=" %{$fg[white]%}on%{$reset_color%} "
-  YS_VCS_PROMPT_PREFIX2=":%{$fg[cyan]%}"
-  YS_VCS_PROMPT_SUFFIX="%{$reset_color%}"
-  YS_VCS_PROMPT_DIRTY=" %{$fg[red]%}✗"
-  YS_VCS_PROMPT_CLEAN=" %{$fg[green]%}✓"
-
-  # Git-specific formatting
-  zstyle ':vcs_info:git*' formats "${YS_VCS_PROMPT_PREFIX1}git${YS_VCS_PROMPT_PREFIX2}%b${YS_VCS_PROMPT_DIRTY}%u${YS_VCS_PROMPT_CLEAN}%c"
-
   # Check if running remotely via SSH
-  ssh_info() {
-    if [[ -n "$SSH_CLIENT" || -n "$SSH2_CLIENT" ]]; then
-      p_host='%F{yellow}(remote)%M%f'
-    else
-      p_host='%F{green}%M%f'
+  if [[ -n "$SSH_CLIENT" || -n "$SSH2_CLIENT" ]]; then
+    p_host='%F{yellow}(remote)%M%f'
+  else
+    p_host='%F{green}%M%f'
+  fi
+
+  # Check if we're in a virtual environment
+  function virtualenv_info {
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+      echo " %F{blue}[%F{yellow}$(basename $VIRTUAL_ENV)%F{blue}]%f"
     fi
   }
-  ssh_info
+
+  # Get exit code
+  local exit_code="%(?..%F{red}%?%f)"
 
   # Set the prompt format
   PROMPT="
@@ -481,14 +519,15 @@ setprompt() {
 ${p_host} \
 %{$fg[white]%}in \
 %{$terminfo[bold]$fg[yellow]%}%~%{$reset_color%}\
-${venv_info}\
-\${vcs_info_msg_0_}\
+\$(virtualenv_info)\
+\$(git_prompt_info)\
  \
 %{$fg[white]%}[%*] $exit_code
 %{$terminfo[bold]$fg[yellow]%}-> %{$reset_color%}"
 
   PS2=$'%_>'
 }
+
 setprompt
 
 #------------------------------
