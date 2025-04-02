@@ -19,6 +19,7 @@
 	# 支持中文路径  
 [core]
 	quotepath = false 
+	autocrlf = input
 	# status引用路径不再是八进制（反过来说就是允许显示中文了）
 [difftool "sourcetree"]
 	cmd = "'' "
