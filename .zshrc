@@ -483,7 +483,7 @@ function git_prompt_info() {
     branch=${branch#refs/heads/}
 
     # Format the prompt
-    git_prompt="%F{blue}(%F{red}${branch}%F{blue})"
+    git_prompt="%F{blue}(%F{green}${branch}%F{blue})"
     [[ -n $dirty ]] && git_prompt+="${(j::)flags}%f"
 
     echo -n " %F{white}on%f git:$git_prompt"
@@ -522,7 +522,7 @@ ${p_host} \
 \$(virtualenv_info)\
 \$(git_prompt_info)\
  \
-%{$fg[white]%}[%*] $exit_code
+$exit_code
 %{$terminfo[bold]$fg[yellow]%}-> %{$reset_color%}"
 
   PS2=$'%_>'
