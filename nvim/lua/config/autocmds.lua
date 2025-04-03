@@ -4,7 +4,6 @@
 
 -- Clipboard
 if vim.env.SSH_TTY then
-  opt.clipboard:append("unnamedplus")
   local function paste()
     return vim.split(vim.fn.getreg(""), "\n")
   end
