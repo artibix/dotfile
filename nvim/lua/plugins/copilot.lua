@@ -53,6 +53,7 @@ return {
           javascript = true,
           typescript = true,
           lua = true,
+          markdown = true,
         },
 
         -- Node 命令配置

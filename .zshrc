@@ -58,35 +58,39 @@ zplug 'MichaelAquilina/zsh-you-should-use'        # Reminds you of aliases
 zplug 'junegunn/fzf'                              # Fuzzy finder
 zplug 'wting/autojump'
 
-if [[ -f ~/.autojump/etc/profile.d/autojump.sh ]]; then
+if (( $+commands[brew] )); then
+  # 通过 homebrew 安装的 autojump
+  [[ -f $(brew --prefix)/etc/profile.d/autojump.sh ]] && . $(brew --prefix)/etc/profile.d/autojump.sh
+elif [[ -f ~/.autojump/etc/profile.d/autojump.sh ]]; then
   . ~/.autojump/etc/profile.d/autojump.sh
 else
+  echo "autojump 未安装，尝试通过 git 安装..."
   git clone https://github.com/wting/autojump.git ~/.zsh/autojump
   cd ~/.zsh/autojump && ./install.py
   . ~/.autojump/etc/profile.d/autojump.sh
 fi
 
-# Install plugins if needed
+# install plugins if needed
 if ! zplug check; then
-    printf "Install missing plugins? [y/N]: "
+    printf "install missing plugins? [y/n]: "
     if read -q; then
         echo; zplug install
     fi
 fi
 
-# Load plugins
+# load plugins
 zplug load
 
 #------------------------------
-# Plugin Configuration
+# plugin configuration
 #------------------------------
 
 # zsh-autosuggestions
-export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#5faf87"
-export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+export zsh_autosuggest_highlight_style="fg=#5faf87"
+export zsh_autosuggest_strategy=(history completion)
+export zsh_autosuggest_buffer_max_size=20
 
-# fzf configuration
+# fzf 配置
 if [[ -f ~/.fzf.zsh ]]; then
   source ~/.fzf.zsh
 else
@@ -94,9 +98,16 @@ else
 fi
 
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude ".git" --exclude "node_modules" . --color=always'
-export FZF_DEFAULT_OPTS="--ansi --preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'"
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# 检查 fd 是否安装
+if (( $+commands[fd] )); then
+export FZF_DEFAULT_COMMAND='fd --type f --exclude ".git" --exclude "node_modules" . --color=always'
 export FZF_ALT_C_COMMAND="fd --type d --exclude .git --exclude node_modules . --color=always"
+else
+export FZF_DEFAULT_COMMAND='find . -type f -not -path "*/\.git/*" -not -path "*/node_modules/*"'
+export FZF_ALT_C_COMMAND="find . -type d -not -path '*/\.git/*' -not -path '*/node_modules/*'"
+fi
+
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
 
 # fzf usage reminder in comment:
@@ -110,16 +121,16 @@ export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
 #------------------------------
 
 if (( $+commands[nvim] )); then
-  export EDITOR='nvim'
-  export VISUAL='nvim'
-  export MANPAGER='nvim +Man!'
+export EDITOR='nvim'
+export VISUAL='nvim'
+export MANPAGER='nvim +Man!'
 elif (( $+commands[vim] )); then
-  export EDITOR='vim'
-  export VISUAL='vim'
-  export MANPAGER='vim -M +MANPAGER -'
+export EDITOR='vim'
+export VISUAL='vim'
+export MANPAGER='vim -M +MANPAGER -'
 else
-  export EDITOR='nano'
-  export VISUAL='nano'
+export EDITOR='nano'
+export VISUAL='nano'
 fi
 
 # Directory colors
@@ -178,8 +189,8 @@ bindkey "\E[4~" end-of-line                         # Alt setup for End
 
 # WSL-specific keybindings
 if [[ "`uname -r`" == *"WSL"* ]]; then
-  bindkey "^A" beginning-of-line                    # Ctrl+A: beginning of line (WSL)
-  bindkey "^E" end-of-line                          # Ctrl+E: end of line (WSL)
+bindkey "^A" beginning-of-line                    # Ctrl+A: beginning of line (WSL)
+bindkey "^E" end-of-line                          # Ctrl+E: end of line (WSL)
 fi
 
 # Keybinding reminder:
@@ -192,6 +203,9 @@ fi
 # Ctrl+G: Cancel search
 # Ctrl+_: Undo
 # Ctrl+X Ctrl+E: Edit command in $EDITOR
+# Option+f: forward word
+# Option+b: backward word
+# Option+d: deleted word after cursor
 
 #------------------------------
 # Aliases
@@ -257,6 +271,113 @@ alias now='date +"%T"'                    # Current time
 alias nowdate='date +"%d-%m-%Y"'          # Current date
 
 #------------------------------
+# 文件和目录大小查看工具
+#------------------------------
+
+# 基本目录大小查看
+alias dush='du -sh'                            # 显示当前目录总大小，人类可读格式
+alias duks='du -k -d 1 | sort -nr'    # 按 KB 排序显示子目录大小
+alias dums='du -m -d 1 | sort -nr'    # 按 MB 排序显示子目录大小
+
+# 列出当前目录下占用空间最大的文件和目录
+alias ducks='du -cks * | sort -rn | head -11'  # 按 KB 列出最大的11个文件/目录
+
+# 列出当前目录最大的10个文件
+alias bigfiles='find . -type f -print0 | xargs -0 du -h | sort -hr | head -10'
+
+# macOS 专用磁盘使用查看
+alias dfh='df -h'                              # 显示所有挂载点的空间使用情况
+alias diskusage='df -h | grep -v "map"'        # 过滤掉 /map 相关的挂载点
+
+# 查看特定文件的大小
+ff-size() {
+  if [ -z "$1" ]; then
+    echo "用法: ff-size <文件模式>"
+    echo "例如: ff-size '*.jpg'"
+    return 1
+  fi
+  find . -name "$1" -exec du -sh {} \; | sort -hr
+}
+
+
+# 递归显示当前目录下各子目录的大小，并按大小排序
+dir-sizes() {
+  du -h -d 1 "${1:-.}" | sort -hr
+}
+
+# 更高级的目录大小分析
+analyze-dir() {
+  local dir="${1:-.}"
+  local exclude="${2:-}"
+  
+  echo "===== 分析目录: $dir ====="
+  echo ""
+  
+  echo "目录总大小:"
+  du -sh "$dir"
+  echo ""
+  
+  echo "一级子目录大小排序:"
+  if [ -z "$exclude" ]; then
+    du -h -d 1 "$dir" | sort -hr
+  else
+    du -h -d 1 "$dir" | grep -v "$exclude" | sort -hr
+  fi
+  echo ""
+  
+  echo "最大的10个文件:"
+  find "$dir" -type f -not -path "*/\.*" -exec du -h {} \; | sort -hr | head -10
+  echo ""
+  
+  echo "按文件类型统计:"
+  find "$dir" -type f -not -path "*/\.*" | grep -o "\.[^\.]*$" | sort | uniq -c | sort -nr
+}
+
+# 显示指定目录中最近修改的大文件
+recent-big-files() {
+  local dir="${1:-.}"
+  local days="${2:-7}"
+  local size="${3:-10M}"
+  
+  echo "过去 $days 天内修改的大于 $size 的文件:"
+  find "$dir" -type f -mtime -"$days" -size +"$size" -exec ls -lh {} \; | sort -k5hr
+}
+
+# 生成目录大小可视化报告 (需要安装 ncdu)
+dirview() {
+  if ! command -v ncdu &> /dev/null; then
+    echo "请先安装 ncdu: brew install ncdu"
+    return 1
+  fi
+  
+  ncdu "${1:-.}"
+}
+
+# 统计指定文件类型的总大小
+size-of-type() {
+  if [ -z "$1" ]; then
+    echo "用法: size-of-type <扩展名>"
+    echo "例如: size-of-type jpg"
+    return 1
+  fi
+  
+  find . -name "*.$1" -exec du -ch {} \; | grep total$
+}
+
+# 查找并列出大于指定大小的文件
+find-large-files() {
+  local size="${1:-100M}"  # 默认100MB
+  local dir="${2:-.}"      # 默认当前目录
+  
+  find "$dir" -type f -size +"$size" -exec ls -lh {} \; | sort -k5hr
+}
+
+# 使用 du 进行格式化输出的目录大小分析
+dud() {
+  du -d "${1:-1}" -h | sort -hr
+}
+
+#------------------------------
 # Functions
 #------------------------------
 
@@ -275,23 +396,98 @@ man() {
 
 # Easy extract function for various archive types
 extract() {
-  if [ -f $1 ] ; then
-    case $1 in
-      *.tar.bz2)   tar xjf $1     ;;
-      *.tar.gz)    tar xzf $1     ;;
-      *.bz2)       bunzip2 $1     ;;
-      *.rar)       unrar e $1     ;;
-      *.gz)        gunzip $1      ;;
-      *.tar)       tar xf $1      ;;
-      *.tbz2)      tar xjf $1     ;;
-      *.tgz)       tar xzf $1     ;;
-      *.zip)       unzip $1       ;;
-      *.Z)         uncompress $1  ;;
-      *.7z)        7z x $1        ;;
-      *)           echo "'$1' cannot be extracted via extract()" ;;
-    esac
+  if [ $# -eq 0 ]; then
+    echo "用法: extract 压缩文件 [目标目录]"
+    echo ""
+    echo "支持的格式:"
+    echo "  .tar.gz, .tgz    - tar 和 gzip 压缩"
+    echo "  .tar.bz2, .tbz2  - tar 和 bzip2 压缩"
+    echo "  .tar.xz, .txz    - tar 和 xz 压缩"
+    echo "  .tar             - 仅 tar 归档"
+    echo "  .gz              - gzip 压缩"
+    echo "  .bz2             - bzip2 压缩"
+    echo "  .xz              - xz 压缩"
+    echo "  .zip             - zip 压缩"
+    echo "  .rar             - rar 压缩"
+    echo "  .7z              - 7zip 压缩"
+    echo "  .Z               - compress 压缩"
+    return 1
+  fi
+
+  local file="$1"
+  local target_dir="${2:-.}"
+  
+  if [ ! -f "$file" ]; then
+    echo "'$file' 不是有效文件"
+    return 1
+  fi
+
+  # 创建目标目录（如果不存在）
+  if [ ! -d "$target_dir" ]; then
+    mkdir -p "$target_dir"
+  fi
+
+  # 切换到目标目录
+  cd "$target_dir"
+  
+  case "$file" in
+    *.tar.bz2|*.tbz2)
+      echo "正在解压 tar.bz2 文件..."
+      tar xjf "$file"
+      ;;
+    *.tar.gz|*.tgz)
+      echo "正在解压 tar.gz 文件..."
+      tar xzf "$file"
+      ;;
+    *.tar.xz|*.txz)
+      echo "正在解压 tar.xz 文件..."
+      tar xJf "$file"
+      ;;
+    *.bz2)
+      echo "正在解压 bzip2 文件..."
+      bunzip2 -k "$file"
+      ;;
+    *.rar)
+      echo "正在解压 rar 文件..."
+      unrar x "$file"
+      ;;
+    *.gz)
+      echo "正在解压 gzip 文件..."
+      gunzip -k "$file"
+      ;;
+    *.tar)
+      echo "正在解压 tar 文件..."
+      tar xf "$file"
+      ;;
+    *.zip)
+      echo "正在解压 zip 文件..."
+      unzip "$file"
+      ;;
+    *.Z)
+      echo "正在解压 Z 文件..."
+      uncompress "$file"
+      ;;
+    *.7z)
+      echo "正在解压 7z 文件..."
+      7z x "$file"
+      ;;
+    *)
+      echo "'$file' 无法通过 extract() 解压，未知格式"
+      cd - > /dev/null
+      return 1
+      ;;
+  esac
+  
+  # 返回原始目录（如果目标目录不是当前目录）
+  if [ "$target_dir" != "." ]; then
+    cd - > /dev/null
+  fi
+  
+  if [ $? -eq 0 ]; then
+    echo "$file 已成功解压到 $target_dir"
   else
-    echo "'$1' is not a valid file"
+    echo "解压 $file 失败"
+    return 1
   fi
 }
 
@@ -303,7 +499,7 @@ mkcd() {
 # Simple HTTP server in current directory
 serve() {
   local port="${1:-8000}"
-  python -m http.server "$port"
+  python3 -m http.server "$port"
 }
 
 # Find files by name
@@ -340,13 +536,6 @@ checkproxy() {
     echo "  http_proxy:  ${http_proxy:-not set}"
     echo "  https_proxy: ${https_proxy:-not set}"
     echo "  all_proxy:   ${all_proxy:-not set}"
-}
-
-unsetproxy() {
-    unset http_proxy
-    unset https_proxy
-    unset all_proxy
-    echo "HTTP Proxy disabled"
 }
 
 set-simple-prompt() {
@@ -553,7 +742,7 @@ unset __conda_setup
 export PATH="$PATH:$HOME/.lmstudio/bin"
 
 # Initialize proxy by default (comment out if not needed)
-setproxy
+# setproxy
 
 clear
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
@@ -562,3 +751,95 @@ autoload -Uz compinit
 compinit
 # End of Docker CLI completions
 
+# 使用asciinema录制终端会话
+record-terminal() {
+  if ! command -v asciinema &> /dev/null; then
+    echo "请先安装 asciinema: brew install asciinema"
+    return 1
+  fi
+  
+  local filename="${1:-terminal-recording}"
+  asciinema rec "$filename.cast"
+  echo "录制已保存到 $filename.cast"
+  echo "使用 'asciinema play $filename.cast' 回放"
+  echo "或 'asciinema upload $filename.cast' 分享到网上"
+}
+# 快速备份文件
+bak() { cp -r "$1" "$1.bak-$(date +%Y%m%d-%H%M%S)"; }
+
+# 通用压缩函数
+compress() {
+  if [ $# -lt 2 ]; then
+    echo "用法: compress 输出文件名.扩展名 文件或目录 [文件或目录...]"
+    echo ""
+    echo "支持的扩展名:"
+    echo "  .tar.gz, .tgz    - 使用 tar 和 gzip 压缩"
+    echo "  .tar.bz2, .tbz2  - 使用 tar 和 bzip2 压缩"
+    echo "  .tar.xz, .txz    - 使用 tar 和 xz 压缩"
+    echo "  .tar             - 仅 tar 归档，无压缩"
+    echo "  .gz              - 使用 gzip 压缩单个文件"
+    echo "  .bz2             - 使用 bzip2 压缩单个文件"
+    echo "  .xz              - 使用 xz 压缩单个文件"
+    echo "  .zip             - 使用 zip 压缩"
+    echo "  .7z              - 使用 7zip 压缩"
+    return 1
+  fi
+  
+  local output="$1"
+  shift
+  
+  case "$output" in
+    *.tar.gz|*.tgz)
+      tar -czvf "$output" "$@"
+      ;;
+    *.tar.bz2|*.tbz2)
+      tar -cjvf "$output" "$@"
+      ;;
+    *.tar.xz|*.txz)
+      tar -cJvf "$output" "$@"
+      ;;
+    *.tar)
+      tar -cvf "$output" "$@"
+      ;;
+    *.gz)
+      if [ $# -ne 1 ]; then
+        echo "gzip 只能压缩单个文件，请使用 .tar.gz 来压缩多个文件"
+        return 1
+      fi
+      gzip -c "$1" > "$output"
+      ;;
+    *.bz2)
+      if [ $# -ne 1 ]; then
+        echo "bzip2 只能压缩单个文件，请使用 .tar.bz2 来压缩多个文件"
+        return 1
+      fi
+      bzip2 -c "$1" > "$output"
+      ;;
+    *.xz)
+      if [ $# -ne 1 ]; then
+        echo "xz 只能压缩单个文件，请使用 .tar.xz 来压缩多个文件"
+        return 1
+      fi
+      xz -c "$1" > "$output"
+      ;;
+    *.zip)
+      zip -r "$output" "$@"
+      ;;
+    *.7z)
+      7z a "$output" "$@"
+      ;;
+    *)
+      echo "不支持的格式: $output"
+      echo "支持的格式: .tar.gz, .tgz, .tar.bz2, .tbz2, .tar.xz, .txz, .tar, .gz, .bz2, .xz, .zip, .7z"
+      return 1
+      ;;
+  esac
+  
+  if [ $? -eq 0 ]; then
+    echo "已创建: $output"
+    du -sh "$output"
+  else
+    echo "压缩失败"
+    return 1
+  fi
+}
