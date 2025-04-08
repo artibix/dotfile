@@ -722,7 +722,42 @@ $exit_code
 #------------------------------
 
 setprompt
-tmux
+
+# 智能启动 tmux
+# 只在以下条件都满足时启动 tmux:
+# 1. tmux 已安装
+# 2. 不在现有的 tmux 会话中
+# 3. 不在 nvim 等编辑器的终端中
+# 4. 是交互式终端
+start_tmux() {
+  # 检查 tmux 是否已安装
+  if command -v tmux &> /dev/null; then
+    # 检查是否已在 tmux 会话中
+    if [[ -z "$TMUX" ]]; then
+      # 检查是否在 nvim 或其他编辑器的终端中
+      # 通过检查 TERM 变量和父进程
+      if [[ "$TERM_PROGRAM" != "vscode" ]] && \
+         [[ "$TERM" != "dumb" ]] && \
+         [[ -z "$NVIM" ]] && \
+         [[ -z "$NVIM_LISTEN_ADDRESS" ]] && \
+         [[ -z "$VIM_TERMINAL" ]] && \
+         [[ "$VIMRUNTIME" = "" ]]; then
+        # 检查父进程，避免在 nvim 的终端中启动
+        local parent_process=$(ps -o comm= -p $PPID)
+        if [[ "$parent_process" != *"nvim"* ]] && \
+           [[ "$parent_process" != *"vim"* ]]; then
+          # 交互式终端检查
+          if [[ -t 1 ]]; then
+            tmux
+          fi
+        fi
+      fi
+    fi
+  fi
+}
+
+# 调用函数启动 tmux
+start_tmux
 
 #------------------------------
 # External Configs
