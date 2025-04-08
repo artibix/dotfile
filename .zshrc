@@ -717,7 +717,12 @@ $exit_code
   PS2=$'%_>'
 }
 
+#------------------------------
+# Auto running 
+#------------------------------
+
 setprompt
+tmux
 
 #------------------------------
 # External Configs
@@ -842,4 +847,12 @@ compress() {
     echo "压缩失败"
     return 1
   fi
+}
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	\rm -f -- "$tmp"
 }
