@@ -98,13 +98,14 @@ else
 fi
 
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude ".git" --exclude "node_modules" . --color=always'
+export FZF_DEFAULT_OPTS='--ansi'
 # 检查 fd 是否安装
 if (( $+commands[fd] )); then
-export FZF_DEFAULT_COMMAND='fd --type f --exclude ".git" --exclude "node_modules" . --color=always'
-export FZF_ALT_C_COMMAND="fd --type d --exclude .git --exclude node_modules . --color=always"
+  export FZF_DEFAULT_COMMAND='fd --type f --exclude ".git" --exclude "node_modules" . --color=always'
+  export FZF_ALT_C_COMMAND="fd --type d --exclude .git --exclude node_modules . --color=always"
 else
-export FZF_DEFAULT_COMMAND='find . -type f -not -path "*/\.git/*" -not -path "*/node_modules/*"'
-export FZF_ALT_C_COMMAND="find . -type d -not -path '*/\.git/*' -not -path '*/node_modules/*'"
+  export FZF_DEFAULT_COMMAND='find . -type f -not -path "*/\.git/*" -not -path "*/node_modules/*"'
+  export FZF_ALT_C_COMMAND="find . -type d -not -path '*/\.git/*' -not -path '*/node_modules/*'"
 fi
 
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
