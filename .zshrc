@@ -1,9 +1,9 @@
 #------------------------------------------------------------------#
 # File:     .zshrc   ZSH resource file                             #
 # Author:   manu2x@qq.com                                          #
-# Updated:  March 2025                                             #
 #------------------------------------------------------------------#
-
+zmodload zsh/datetime
+starttime=$EPOCHREALTIME
 #------------------------------
 # ZSH Core Configuration
 #------------------------------
@@ -58,6 +58,7 @@ zplug 'MichaelAquilina/zsh-you-should-use'        # Reminds you of aliases
 zplug 'junegunn/fzf'                              # Fuzzy finder
 zplug 'wting/autojump'
 
+DRACULA_DISPLAY_CONTEXT=1
 if (( $+commands[brew] )); then
   # 通过 homebrew 安装的 autojump
   [[ -f $(brew --prefix)/etc/profile.d/autojump.sh ]] && . $(brew --prefix)/etc/profile.d/autojump.sh
@@ -74,7 +75,7 @@ fi
 if ! zplug check; then
     printf "install missing plugins? [y/n]: "
     if read -q; then
-        echo; zplug install
+        echo; zplug install --verbose
     fi
 fi
 
@@ -217,7 +218,6 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
-alias -- -='cd -'
 
 # git shortcuts
 alias gaa="git add --all"
@@ -246,11 +246,6 @@ alias diff="diff --color=auto"            # Colorized diff output
 
 # System management
 alias spm="sudo pacman"                   # Arch/Manjaro package manager shortcut
-alias sys='systemctl'                     # Systemd shortcut
-alias sysu='systemctl --user'             # User systemd shortcut
-alias dps='docker ps'                     # Docker process list
-alias dpsa='docker ps -a'                 # Docker all processes
-alias dl='docker logs'                    # Docker logs
 
 # Windows subsystem
 alias subl='subl.exe'                     # Sublime Text (Windows)
@@ -262,11 +257,9 @@ alias sail='bash vendor/bin/sail'         # Laravel Sail
 alias nv='nvim'                           # Neovim
 
 # Networking
-alias ports='netstat -tulanp'             # Show open ports
+alias ports='netstat -tulan'             # Show open ports
 
 # General
-alias h='history'                         # History shortcut
-alias c='clear'                           # Clear screen
 alias path='echo -e ${PATH//:/\\n}'       # Print path in readable format
 alias now='date +"%T"'                    # Current time
 alias nowdate='date +"%d-%m-%Y"'          # Current date
@@ -275,36 +268,9 @@ alias nowdate='date +"%d-%m-%Y"'          # Current date
 # 文件和目录大小查看工具
 #------------------------------
 
-# 基本目录大小查看
-alias dush='du -sh'                            # 显示当前目录总大小，人类可读格式
-alias duks='du -k -d 1 | sort -nr'    # 按 KB 排序显示子目录大小
-alias dums='du -m -d 1 | sort -nr'    # 按 MB 排序显示子目录大小
-
-# 列出当前目录下占用空间最大的文件和目录
-alias ducks='du -cks * | sort -rn | head -11'  # 按 KB 列出最大的11个文件/目录
-
-# 列出当前目录最大的10个文件
-alias bigfiles='find . -type f -print0 | xargs -0 du -h | sort -hr | head -10'
-
 # macOS 专用磁盘使用查看
 alias dfh='df -h'                              # 显示所有挂载点的空间使用情况
 alias diskusage='df -h | grep -v "map"'        # 过滤掉 /map 相关的挂载点
-
-# 查看特定文件的大小
-ff-size() {
-  if [ -z "$1" ]; then
-    echo "用法: ff-size <文件模式>"
-    echo "例如: ff-size '*.jpg'"
-    return 1
-  fi
-  find . -name "$1" -exec du -sh {} \; | sort -hr
-}
-
-
-# 递归显示当前目录下各子目录的大小，并按大小排序
-dir-sizes() {
-  du -h -d 1 "${1:-.}" | sort -hr
-}
 
 # 更高级的目录大小分析
 analyze-dir() {
@@ -503,9 +469,6 @@ serve() {
   python3 -m http.server "$port"
 }
 
-# Find files by name
-ff() { find . -type f -name "*$1*" -print; }
-
 setproxy() {
     local host="${1:-localhost}"
     local port="${2:-8888}"
@@ -537,11 +500,6 @@ checkproxy() {
     echo "  http_proxy:  ${http_proxy:-not set}"
     echo "  https_proxy: ${https_proxy:-not set}"
     echo "  all_proxy:   ${all_proxy:-not set}"
-}
-
-set-simple-prompt() {
-  PROMPT="%{$fg[green]%}➜ %{$fg[blue]%}%~%  "
-  PS2=$'%_>'
 }
 
 #------------------------------
@@ -603,126 +561,8 @@ zstyle ':completion:*:*:*:*:processes' menu yes select
 fpath=($HOME/.docker/completions $fpath)
 
 #------------------------------
-# Window title
-#------------------------------
-case $TERM in
-  termite|*xterm*|rxvt|rxvt-unicode|rxvt-256color|rxvt-unicode-256color|(dt|k|E)term)
-    precmd () {
-      vcs_info
-      print -Pn "\e]0;[%n@%M][%~]%#\a"
-    }
-    preexec () { print -Pn "\e]0;[%n@%M][%~]%# ($1)\a" }
-    ;;
-  screen|screen-256color|tmux|tmux-256color)
-    precmd () {
-      vcs_info
-      print -Pn "\e]83;title \"$1\"\a"
-      print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~]\a"
-    }
-    preexec () {
-      print -Pn "\e]83;title \"$1\"\a"
-      print -Pn "\e]0;$TERM - (%L) [%n@%M]%# [%~] ($1)\a"
-    }
-    ;;
-esac
-
-#------------------------------
-# Prompt
-#------------------------------
-# Load colors and terminfo
-autoload -U colors zsh/terminfo
-colors
-
-# Setup version control info
-autoload -Uz vcs_info
-zstyle ':vcs_info:*' enable git hg svn
-zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:git*' formats "%F{blue}(%F{red}%b%F{blue})%F{yellow}%c%u%f"
-zstyle ':vcs_info:git*' actionformats "%F{blue}(%F{red}%b%F{yellow}|%F{red}%a%F{blue})%F{yellow}%c%u%f"
-zstyle ':vcs_info:*' stagedstr "+"
-zstyle ':vcs_info:*' unstagedstr "!"
-
-# Cache git status output to improve performance
-function git_prompt_info() {
-  # Only execute in git repositories
-  if git rev-parse --is-inside-work-tree &>/dev/null; then
-    local dirty
-    local git_status
-    local -a flags
-    local git_prompt
-
-    # Cache status result to avoid repeated calls
-    if [[ "$(command git config --get oh-my-zsh.hide-status 2>/dev/null)" != "1" ]]; then
-      git_status=$(command git status --porcelain 2>/dev/null)
-      
-      # Check for uncommitted changes
-      if [[ -n $git_status ]]; then
-        dirty=1
-        # Parse status to check for staged and unstaged changes
-        if echo "$git_status" | grep -q '^[ACDMR]'; then
-          flags+=( "%F{green}+" )
-        fi
-        if echo "$git_status" | grep -q '^.[DM]'; then
-          flags+=( "%F{red}!" )
-        fi
-      fi
-    fi
-
-    # Get branch name
-    local branch=$(git symbolic-ref HEAD 2>/dev/null)
-    branch=${branch#refs/heads/}
-
-    # Format the prompt
-    git_prompt="%F{blue}(%F{green}${branch}%F{blue})"
-    [[ -n $dirty ]] && git_prompt+="${(j::)flags}%f"
-
-    echo -n " %F{white}on%f git:$git_prompt"
-  fi
-}
-
-# Set the prompt
-setprompt() {
-  setopt prompt_subst
-
-  # Check if running remotely via SSH
-  if [[ -n "$SSH_CLIENT" || -n "$SSH2_CLIENT" ]]; then
-    p_host='%F{yellow}(remote)%M%f'
-  else
-    p_host='%F{green}%M%f'
-  fi
-
-  # Check if we're in a virtual environment
-  function virtualenv_info {
-    if [[ -n "$VIRTUAL_ENV" ]]; then
-      echo " %F{blue}[%F{yellow}$(basename $VIRTUAL_ENV)%F{blue}]%f"
-    fi
-  }
-
-  # Get exit code
-  local exit_code="%(?..%F{red}%?%f)"
-
-  # Set the prompt format
-  PROMPT="
-%{$terminfo[bold]$fg[blue]%}#%{$reset_color%} \
-%(#,%{$bg[yellow]%}%{$fg[black]%}%n%{$reset_color%},%{$fg[cyan]%}%n) \
-%{$fg[white]%}@ \
-${p_host} \
-%{$fg[white]%}in \
-%{$terminfo[bold]$fg[yellow]%}%~%{$reset_color%}\
-\$(virtualenv_info)\
-\$(git_prompt_info)\
- \
-$exit_code
-%{$terminfo[bold]$fg[yellow]%}-> %{$reset_color%}"
-
-  PS2=$'%_>'
-}
-
-#------------------------------
 # Auto running 
 #------------------------------
-
-setprompt
 
 # 智能启动 tmux
 # 只在以下条件都满足时启动 tmux:
@@ -742,7 +582,8 @@ start_tmux() {
          [[ -z "$NVIM" ]] && \
          [[ -z "$NVIM_LISTEN_ADDRESS" ]] && \
          [[ -z "$VIM_TERMINAL" ]] && \
-         [[ "$VIMRUNTIME" = "" ]]; then
+         [[ "$VIMRUNTIME" = "" ]] && \
+         [[ "$TERMINAL_EMULATOR" != "JetBrains-JediTerm" ]]; then
         # 检查父进程，避免在 nvim 的终端中启动
         local parent_process=$(ps -o comm= -p $PPID)
         if [[ "$parent_process" != *"nvim"* ]] && \
@@ -783,7 +624,7 @@ unset __conda_setup
 export PATH="$PATH:$HOME/.lmstudio/bin"
 
 # Initialize proxy by default (comment out if not needed)
-# setproxy
+setproxy
 
 clear
 # The following lines have been added by Docker Desktop to enable Docker CLI completions.
@@ -892,3 +733,17 @@ function y() {
 	fi
 	\rm -f -- "$tmp"
 }
+___MY_VMOPTIONS_SHELL_FILE="${HOME}/.jetbrains.vmoptions.sh"; if [ -f "${___MY_VMOPTIONS_SHELL_FILE}" ]; then . "${___MY_VMOPTIONS_SHELL_FILE}"; fi
+endtime=$EPOCHREALTIME
+loadtime=$(( $endtime - $starttime ))
+
+# 根据加载时间选择颜色和图标
+if (( $loadtime < 0.3 )); then
+  printf "\033[32m⚡ ZSH启动: %.3f秒\033[0m\n" $loadtime
+elif (( $loadtime < 0.8 )); then
+  printf "\033[36m✓ ZSH启动: %.3f秒\033[0m\n" $loadtime
+elif (( $loadtime < 2.0 )); then
+  printf "\033[33m⏱ ZSH启动: %.3f秒\033[0m\n" $loadtime
+else
+  printf "\033[31m⏰ ZSH启动: %.3f秒\033[0m\n" $loadtime
+fi

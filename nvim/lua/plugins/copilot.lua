@@ -5,30 +5,14 @@ return {
     event = "InsertEnter",
     config = function()
       require("copilot").setup({
-        -- 面板配置
-        panel = {
-          enabled = true,
-          auto_refresh = true, -- 是否自动刷新建议
-          keymap = {
-            jump_prev = "[[",
-            jump_next = "]]",
-            accept = "<CR>",
-            refresh = "gr",
-            open = "<M-CR>",
-          },
-          layout = {
-            position = "bottom", -- 可选: bottom | top | left | right
-            ratio = 0.4,
-          },
-        },
 
-        -- 建议配置
         suggestion = {
-          enabled = true,
-          auto_trigger = true, -- 设置为 true 可自动显示建议
+          enabled = not vim.g.ai_cmp,
+          auto_trigger = true,
+          hide_during_completion = vim.g.ai_cmp,
           debounce = 75, -- 延迟时间(毫秒)
           keymap = {
-            accept = "<M-l>", -- 接受建议的快捷键
+            accept = false, -- 接受建议的快捷键
             accept_word = false, -- 接受单词建议
             accept_line = false, -- 接受整行建议
             next = "<M-]>", -- 下一个建议
@@ -53,7 +37,6 @@ return {
           javascript = true,
           typescript = true,
           lua = true,
-          markdown = true,
         },
 
         -- Node 命令配置
