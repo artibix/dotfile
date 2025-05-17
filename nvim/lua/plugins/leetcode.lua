@@ -2,6 +2,7 @@ local leet_arg = "leetcode.nvim"
 
 return {
   "kawre/leetcode.nvim",
+  cmd = "Leet",
   build = ":TSUpdate html", -- if you have `nvim-treesitter` installed
   lazy = leet_arg ~= vim.fn.argv(0, -1),
   dependencies = {
@@ -48,7 +49,7 @@ return {
     ---@type lc.storage
 
     storage = {
-      home = "/Users/artbix/Github/MyLeetcode",
+      home = "/Users/ashark/Github/MyLeetcode",
       cache = vim.fn.stdpath("cache") .. "/leetcode",
     },
 

@@ -1,7 +1,8 @@
 #------------------------------------------------------------------#
 # File:     .zshrc   ZSH resource file                             #
-# Author:   manu2x@qq.com                                          #
+# Author: artibix                                          #
 #------------------------------------------------------------------#
+# zmodload zsh/zprof
 zmodload zsh/datetime
 starttime=$EPOCHREALTIME
 #------------------------------
@@ -58,7 +59,8 @@ zplug 'MichaelAquilina/zsh-you-should-use'        # Reminds you of aliases
 zplug 'junegunn/fzf'                              # Fuzzy finder
 zplug 'wting/autojump'
 
-DRACULA_DISPLAY_CONTEXT=1
+export DRACULA_DISPLAY_CONTEXT=1
+
 if (( $+commands[brew] )); then
   # 通过 homebrew 安装的 autojump
   [[ -f $(brew --prefix)/etc/profile.d/autojump.sh ]] && . $(brew --prefix)/etc/profile.d/autojump.sh
@@ -733,7 +735,6 @@ function y() {
 	fi
 	\rm -f -- "$tmp"
 }
-___MY_VMOPTIONS_SHELL_FILE="${HOME}/.jetbrains.vmoptions.sh"; if [ -f "${___MY_VMOPTIONS_SHELL_FILE}" ]; then . "${___MY_VMOPTIONS_SHELL_FILE}"; fi
 endtime=$EPOCHREALTIME
 loadtime=$(( $endtime - $starttime ))
 
@@ -747,3 +748,8 @@ elif (( $loadtime < 2.0 )); then
 else
   printf "\033[31m⏰ ZSH启动: %.3f秒\033[0m\n" $loadtime
 fi
+___MY_VMOPTIONS_SHELL_FILE="${HOME}/.jetbrains.vmoptions.sh"; if [ -f "${___MY_VMOPTIONS_SHELL_FILE}" ]; then . "${___MY_VMOPTIONS_SHELL_FILE}"; fi
+
+# yao
+export YAO_INSTALL="$HOME/.yao"
+export PATH="$YAO_INSTALL/bin:$PATH"
