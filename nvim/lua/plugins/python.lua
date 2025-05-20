@@ -13,19 +13,14 @@ return {
     },
     opts = {
       settings = {
-        options = {
-          enable_default_searches = false,
-        },
+        options = {},
 
         search = {
+          uv = {
+            command = "fd 'bin/python$' /Users/ashark/.local/share/uv/python/ --full-path",
+          },
           MacAnaconda3 = {
             command = "fd /bin/python$ /opt/anaconda3/envs/ --full-path",
-          },
-          MacOS = {
-            command = "fd 'bin/python' /Library/Frameworks/Python.framework/ --full-path",
-          },
-          workspace = {
-            command = "fd 'bin/python' .venv -I --full-path",
           },
         },
       },

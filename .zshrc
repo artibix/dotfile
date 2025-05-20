@@ -3,8 +3,8 @@
 # Author: artibix                                          #
 #------------------------------------------------------------------#
 # zmodload zsh/zprof
-zmodload zsh/datetime
-starttime=$EPOCHREALTIME
+# zmodload zsh/datetime
+# starttime=$EPOCHREALTIME
 #------------------------------
 # ZSH Core Configuration
 #------------------------------
@@ -161,6 +161,12 @@ export SASS_BINARY_SITE=http://npm.taobao.org/mirrors/node-sass
 # Java / OpenJDK
 export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 
+# yao
+export YAO_INSTALL="$HOME/.yao"
+export PATH="$YAO_INSTALL/bin:$PATH"
+
+# go
+export PATH="$PATH:$HOME/go/bin"
 #------------------------------
 # Keybindings
 #------------------------------
@@ -333,13 +339,6 @@ size-of-type() {
   find . -name "*.$1" -exec du -ch {} \; | grep total$
 }
 
-# 查找并列出大于指定大小的文件
-find-large-files() {
-  local size="${1:-100M}"  # 默认100MB
-  local dir="${2:-.}"      # 默认当前目录
-  
-  find "$dir" -type f -size +"$size" -exec ls -lh {} \; | sort -k5hr
-}
 
 # 使用 du 进行格式化输出的目录大小分析
 dud() {
@@ -735,21 +734,23 @@ function y() {
 	fi
 	\rm -f -- "$tmp"
 }
-endtime=$EPOCHREALTIME
-loadtime=$(( $endtime - $starttime ))
+# endtime=$EPOCHREALTIME
+# loadtime=$(( $endtime - $starttime ))
+#
+# # 根据加载时间选择颜色和图标
+# if (( $loadtime < 0.3 )); then
+#   printf "\033[32m⚡ ZSH启动: %.3f秒\033[0m\n" $loadtime
+# elif (( $loadtime < 0.8 )); then
+#   printf "\033[36m✓ ZSH启动: %.3f秒\033[0m\n" $loadtime
+# elif (( $loadtime < 2.0 )); then
+#   printf "\033[33m⏱ ZSH启动: %.3f秒\033[0m\n" $loadtime
+# else
+#   printf "\033[31m⏰ ZSH启动: %.3f秒\033[0m\n" $loadtime
+# fi
 
-# 根据加载时间选择颜色和图标
-if (( $loadtime < 0.3 )); then
-  printf "\033[32m⚡ ZSH启动: %.3f秒\033[0m\n" $loadtime
-elif (( $loadtime < 0.8 )); then
-  printf "\033[36m✓ ZSH启动: %.3f秒\033[0m\n" $loadtime
-elif (( $loadtime < 2.0 )); then
-  printf "\033[33m⏱ ZSH启动: %.3f秒\033[0m\n" $loadtime
-else
-  printf "\033[31m⏰ ZSH启动: %.3f秒\033[0m\n" $loadtime
-fi
 ___MY_VMOPTIONS_SHELL_FILE="${HOME}/.jetbrains.vmoptions.sh"; if [ -f "${___MY_VMOPTIONS_SHELL_FILE}" ]; then . "${___MY_VMOPTIONS_SHELL_FILE}"; fi
-
-# yao
-export YAO_INSTALL="$HOME/.yao"
-export PATH="$YAO_INSTALL/bin:$PATH"
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/ashark/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
